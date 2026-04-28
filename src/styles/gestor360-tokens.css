@@ -121,4 +121,36 @@
   --z-modal:   200;
   --z-toast:   300;
   --z-header:  400;
+
+  /* ─── ESTADOS INTERATIVOS ────────────────────────────── */
+  --color-brand-blue-hover:    #163060;
+  --color-brand-blue-active:   #0d1f45;
+  --color-brand-blue-subtle:   oklch(from #1f3f7a l c h / 0.10);
+  --color-brand-gold-hover:    #b8891a;
+  --color-brand-gold-subtle:   oklch(from #d4a020 l c h / 0.12);
+  --color-stone-accessible:    #6B6B6B; /* ratio 4.2:1 sobre canvas — use para texto pequeno */
+
+  /* ─── FOCO / ACESSIBILIDADE ──────────────────────────── */
+  --focus-ring:        0 0 0 3px var(--color-border-focus);
+  --focus-ring-offset: 2px;
+  --touch-target-min:  48px;
+
+  /* ─── CONTAINERS ─────────────────────────────────────── */
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1200px;
+
+  /* ─── ANIMAÇÕES (Framer Motion) ──────────────────────── */
+  --motion-duration-enter: 500ms;
+  --motion-duration-page:  300ms;
+  --motion-stagger-base:   100ms;
+
+  /* ─── GRADIENTES ─────────────────────────────────────── */
+  --gradient-360: linear-gradient(
+    90deg,
+    var(--color-brand-stone),
+    var(--color-brand-blue),
+    var(--color-brand-gold)
+  );
 }
