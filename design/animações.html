@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor360® — Animações</title>
+<link rel="stylesheet" href="https://use.typekit.net/pwr2rya.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue:  #1F3F7A;
+    --gold:  #D4A020;
+    --stone: #8B8B8B;
+    --ink:   #1A1A1A;
+    --canvas:#E8E6E1;
+    --text:  #5A5A5A;
+    --white: #FFFFFF;
+    --border:#D8D5CF;
+    --fd: 'gotham', sans-serif;
+    --fb: 'DM Sans', sans-serif;
+  }
+  html, body { height: 100%; }
+  body { font-family: var(--fb); background: #F0EDE8; color: var(--ink); }
+
+  /* ── SHELL ── */
+  .shell {
+    max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem;
+  }
+  .shell-title {
+    font-family: var(--fd); font-weight: 700; font-size: 0.72rem;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--stone);
+    margin-bottom: 0.4rem;
+  }
+  .shell-heading {
+    font-family: var(--fd); font-weight: 700; font-size: 1.75rem;
+    color: var(--ink); margin-bottom: 2.5rem; line-height: 1.2;
+  }
+  .shell-heading span { color: var(--blue); }
+
+  /* ── SECTION BLOCK ── */
+  .anim-block {
+    margin-bottom: 3rem;
+  }
+  .anim-label {
+    font-family: var(--fd); font-weight: 700; font-size: 0.7rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--stone);
+    margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .anim-label::before {
+    content: ''; display: inline-block; width: 16px; height: 2px;
+    background: var(--blue); border-radius: 99px;
+  }
+  .anim-label-name { color: var(--blue); }
+  .anim-desc {
+    font-size: 0.875rem; color: var(--text); margin-bottom: 1.25rem;
+    max-width: 560px; line-height: 1.6;
+  }
+
+  /* ── HERO STAGE WRAPPER ── */
+  .hero-stage-wrap {
+    background: var(--canvas); border-radius: 14px; overflow: hidden;
+    position: relative; min-height: 380px;
+  }
+
+  /* ── CARD SCROLL DEMO ── */
+  .scroll-demo {
+    background: #F7F5F1; border-radius: 14px; padding: 2.5rem 2rem;
+    overflow: hidden;
+  }
+  .scroll-demo-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 1rem;
+  }
+
+  /* ── PAGE TRANSITION DEMO ── */
+  .page-demo {
+    border-radius: 14px; overflow: hidden; position: relative;
+    background: var(--white); min-height: 300px;
+    border: 1px solid var(--border);
+  }
+  .page-demo-controls {
+    display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    padding: 0.5rem 1.25rem; border-radius: 6px;
+    font-family: var(--fd); font-weight: 600; font-size: 0.8125rem;
+    letter-spacing: 0.02em; cursor: pointer; border: 2px solid var(--blue);
+    color: var(--blue); background: transparent; transition: all 180ms ease;
+  }
+  .ctrl-btn:hover, .ctrl-btn.active {
+    background: var(--blue); color: white;
+  }
+  .ctrl-btn-gold { border-color: var(--gold); color: var(--gold); }
+  .ctrl-btn-gold:hover, .ctrl-btn-gold.active { background: var(--gold); color: white; }
+
+  /* ── INLINE TOOL CARD ── */
+  .g-tool-card {
+    background: white; border-radius: 12px; border: 1px solid var(--border);
+    overflow: hidden; transition: transform 250ms ease, box-shadow 250ms ease;
+  }
+  .g-tool-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
+  .g-tool-card-top { padding: 1.25rem 1.25rem 0.75rem; display: flex; justify-content: space-between; align-items: flex-start; }
+  .g-chapter-badge {
+    width: 36px; height: 36px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center;
+    font-family: var(--fd); font-weight: 700; font-size: 0.9rem; color: white;
+  }
+  .g-tool-card-body { padding: 0 1.25rem 1.25rem; }
+  .g-tool-cap { font-family: var(--fd); font-weight: 600; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); margin-bottom: 0.25rem; }
+  .g-tool-name { font-family: var(--fd); font-weight: 700; font-size: 0.975rem; color: var(--ink); margin-bottom: 0.4rem; line-height: 1.25; }
+  .g-tool-desc { font-size: 0.8rem; color: var(--text); line-height: 1.55; }
+
+  /* ── SCRUBBER ── */
+  .scrubber-wrap {
+    padding: 0.875rem 1.5rem; background: rgba(0,0,0,0.04);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .scrubber-wrap input[type=range] {
+    flex: 1; accent-color: var(--blue); height: 4px; cursor: pointer;
+  }
+  .scrubber-play {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--blue); color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0; transition: background 150ms;
+  }
+  .scrubber-play:hover { background: #162D5E; }
+  .scrubber-time { font-family: monospace; font-size: 0.75rem; color: var(--stone); min-width: 32px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="animations.jsx"></script>
+<script type="text/babel">
+
+/* ══════════════════════════════════════════════════════
+   1. HERO ANIMATION — "360" + GESTOR com Sprites
+══════════════════════════════════════════════════════ */
+function HeroAnimation() {
+  const t = useTime();
+
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  const ease = Easing.easeOutBack;
+  const easeExpo = Easing.easeOutExpo;
+  const easeSine = Easing.easeOutSine;
+
+  // progress helpers: maps time window to 0→1
+  const prog = (start, end) => clamp01((t - start) / (end - start));
+
+  // Digit entries: stagger 0→0.6, 0.5→1.1, 1.0→1.6
+  const p3 = ease(prog(0.1, 0.7));
+  const p6 = ease(prog(0.55, 1.15));
+  const p0 = ease(prog(1.0, 1.6));
+
+  // "manual do" fades in
+  const pManual = easeSine(prog(1.5, 2.0));
+
+  // "GESTOR" slides from left
+  const pGestor = easeExpo(prog(1.7, 2.3));
+
+  // Subtitle
+  const pSub = easeSine(prog(2.4, 3.0));
+
+  // CTA
+  const pCta = easeSine(prog(2.9, 3.5));
+
+  // Dot ring (circular dots) subtle scale
+  const pRing = easeSine(prog(0.5, 2.0));
+
+  const digit = (p, char, color) => ({
+    opacity: p,
+    transform: `translateY(${lerp(60, 0, p)}px) scale(${lerp(0.6, 1, p)})`,
+    color,
+    display: 'inline-block',
+    lineHeight: 1,
+    fontFamily: "'gotham', sans-serif",
+    fontWeight: 700,
+  });
+
+  return (
+    <div style={{
+      background: 'var(--canvas)', minHeight: 380, padding: '3.5rem 3rem',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      {/* Dot ring decoration */}
+      <div style={{
+        position: 'absolute', right: '5%', top: '50%',
+        transform: 'translateY(-50%)',
+        width: 260, height: 260, borderRadius: '50%',
+        opacity: pRing * 0.18,
+        background: 'radial-gradient(circle, transparent 35%, var(--blue) 36%, transparent 37%, transparent 55%, var(--gold) 56%, transparent 57%)',
+        backgroundSize: '100% 100%',
+      }} />
+      {/* Subtle large "360" behind */}
+      <div style={{
+        position: 'absolute', right: '-2%', top: '50%',
+        transform: `translateY(-50%) scale(${lerp(1.3,1,easeExpo(prog(0,2)))})`,
+        fontFamily:"'gotham',sans-serif", fontWeight:700,
+        fontSize: 280, lineHeight:1, letterSpacing:'-0.04em',
+        display:'flex', gap:0, opacity: 0.04, userSelect:'none',
+      }}>
+        <span style={{color:'var(--stone)'}}>3</span>
+        <span style={{color:'var(--blue)'}}>6</span>
+        <span style={{color:'var(--gold)'}}>0</span>
+      </div>
+
+      {/* Content */}
+      <div style={{position:'relative', zIndex:2}}>
+        {/* "manual do" */}
+        <div style={{
+          fontFamily:"'gotham',sans-serif", fontWeight:400,
+          fontSize:'clamp(1.1rem,2.5vw,1.5rem)',
+          color:'var(--stone)', letterSpacing:'0.04em',
+          marginBottom: '0.25rem',
+          opacity: pManual,
+          transform: `translateX(${lerp(-20,0,pManual)}px)`,
+        }}>
+          manual do
+        </div>
+
+        {/* GESTOR + 360 */}
+        <div style={{display:'flex', alignItems:'baseline', flexWrap:'wrap', gap:'0.1em', lineHeight:1.05}}>
+          {/* GESTOR */}
+          <div style={{
+            fontFamily:"'gotham',sans-serif", fontWeight:700,
+            fontSize:'clamp(3rem,8vw,6rem)',
+            color:'var(--ink)', letterSpacing:'-0.02em',
+            opacity: pGestor,
+            transform: `translateX(${lerp(-40,0,pGestor)}px)`,
+            lineHeight:1,
+          }}>
+            GESTOR
+          </div>
+
+          {/* 360 digits */}
+          <div style={{display:'flex', alignItems:'baseline', lineHeight:1}}>
+            <div style={{...digit(p3, 'var(--stone)','var(--stone)'),
+              fontSize:'clamp(3rem,8vw,6rem)', marginLeft:'0.08em'}}>3</div>
+            <div style={{...digit(p6, 'var(--blue)','var(--blue)'),
+              fontSize:'clamp(3rem,8vw,6rem)'}}>6</div>
+            <div style={{...digit(p0, 'var(--gold)','var(--gold)'),
+              fontSize:'clamp(3rem,8vw,6rem)'}}>0</div>
+          </div>
+        </div>
+
+        {/* Linha decorativa */}
+        <div style={{
+          width: lerp(0, 64, pSub), height: 3,
+          background: 'linear-gradient(90deg, var(--blue), var(--gold))',
+          borderRadius: 99, marginTop: '1.25rem', marginBottom: '1rem',
+        }} />
+
+        {/* Subtítulo */}
+        <div style={{
+          fontFamily:'var(--fb)', fontSize:'clamp(0.9rem,1.8vw,1.1rem)',
+          color:'var(--text)', lineHeight:1.65, maxWidth:480,
+          opacity: pSub, transform:`translateY(${lerp(16,0,pSub)}px)`,
+        }}>
+          Ferramentas e reflexões para líderes que querem{' '}
+          <span style={{color:'var(--ink)', fontWeight:600}}>inspirar</span>,{' '}
+          <span style={{color:'var(--blue)', fontWeight:600}}>evoluir</span>{' '}
+          e{' '}
+          <span style={{color:'var(--gold)', fontWeight:600}}>prosperar</span>{' '}
+          com consciência.
+        </div>
+
+        {/* CTAs */}
+        <div style={{
+          display:'flex', gap:'0.875rem', marginTop:'1.75rem', flexWrap:'wrap',
+          opacity: pCta, transform:`translateY(${lerp(12,0,pCta)}px)`,
+        }}>
+          <button style={{
+            padding:'0.75rem 1.75rem', background:'var(--blue)', color:'white',
+            border:'none', borderRadius:6, fontFamily:"'gotham',sans-serif",
+            fontWeight:600, fontSize:'0.9rem', cursor:'pointer',
+            boxShadow: `0 4px ${lerp(0,20,pCta)}px rgba(31,63,122,0.35)`,
+          }}>
+            Acessar Ferramentas
+          </button>
+          <button style={{
+            padding:'0.75rem 1.75rem', background:'transparent', color:'var(--blue)',
+            border:'2px solid var(--blue)', borderRadius:6, fontFamily:"'gotham',sans-serif",
+            fontWeight:600, fontSize:'0.9rem', cursor:'pointer',
+          }}>
+            Conhecer o Livro
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   2. SCROLL REVEAL — Cards com IntersectionObserver
+══════════════════════════════════════════════════════ */
+const chapterColors = ['#1F3F7A','#2E6B8A','#2D7A4F','#7A2D5C','#8A5C2E','#5C2D7A'];
+const tools = [
+  { n:1, name:'GST', full:'Gestão Sistêmica Total', desc:'Diagnóstico completo em 8 dimensões estratégicas.', cap:'Planejamento' },
+  { n:2, name:'PESTEL', full:'Análise PESTEL', desc:'Mapeie forças macro que impactam seu negócio.', cap:'Planejamento' },
+  { n:3, name:'Rapport', full:'Rapport e PNL', desc:'Conexão genuína com equipe e clientes.', cap:'Comunicação' },
+  { n:4, name:'DRE', full:'DRE Simplificado', desc:'Entenda o resultado real da sua empresa.', cap:'Finanças' },
+  { n:5, name:'OKRs', full:'Painel de OKRs', desc:'Metas e chave-resultados conectados ao time.', cap:'Indicadores' },
+  { n:6, name:'1:1', full:'Reunião 1:1', desc:'Template estruturado de feedback individual.', cap:'Pessoas' },
+];
+
+function ScrollRevealCard({ tool, index }) {
+  const ref = React.useRef(null);
+  const [visible, setVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.15 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="g-tool-card" style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(32px)',
+      transition: `opacity 500ms ease ${index * 90}ms, transform 500ms ease ${index * 90}ms`,
+    }}>
+      <div className="g-tool-card-top">
+        <div className="g-chapter-badge" style={{background: chapterColors[index % chapterColors.length]}}>
+          {tool.n}
+        </div>
+      </div>
+      <div className="g-tool-card-body">
+        <div className="g-tool-cap">{tool.cap}</div>
+        <div className="g-tool-name">{tool.full}</div>
+        <div className="g-tool-desc">{tool.desc}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   3. PAGE TRANSITIONS
+══════════════════════════════════════════════════════ */
+const pages = [
+  {
+    id: 'home', label: 'Home', color: 'var(--canvas)',
+    content: (
+      <div style={{padding:'3rem 2.5rem'}}>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'0.72rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--stone)', marginBottom:'0.5rem'}}>Método de Liderança</div>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'2rem', color:'var(--ink)', lineHeight:1.15, marginBottom:'1rem'}}>
+          O método que une<br/><span style={{color:'var(--blue)'}}>razão e alma.</span>
+        </div>
+        <div style={{fontSize:'0.9rem', color:'var(--text)', lineHeight:1.65}}>Plataforma de liderança consciente para pequenos e médios empresários.</div>
+      </div>
+    )
+  },
+  {
+    id: 'ferramentas', label: 'Ferramentas', color: '#F7F5F1',
+    content: (
+      <div style={{padding:'3rem 2.5rem'}}>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'0.72rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--blue)', marginBottom:'0.5rem'}}>31 Ferramentas</div>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'2rem', color:'var(--ink)', lineHeight:1.15, marginBottom:'1rem'}}>Ferramentas<br/>práticas por capítulo.</div>
+        <div style={{display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
+          {['Planejamento','Comunicação','Delegação','Finanças'].map(c => (
+            <span key={c} style={{padding:'0.25rem 0.75rem', background:'rgba(31,63,122,0.1)', color:'var(--blue)', borderRadius:99, fontSize:'0.75rem', fontFamily:"'gotham',sans-serif", fontWeight:600}}>{c}</span>
+          ))}
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 'livro', label: 'Livro', color: 'var(--ink)',
+    content: (
+      <div style={{padding:'3rem 2.5rem'}}>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'0.72rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'0.5rem'}}>DDM Editora · 2026</div>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:700, fontSize:'2rem', color:'white', lineHeight:1.15, marginBottom:'1rem'}}>Manual do<br/>GESTOR360®</div>
+        <div style={{fontSize:'0.9rem', color:'rgba(255,255,255,0.6)', lineHeight:1.65}}>Flávio Di Morais · Marcelo Caetano</div>
+      </div>
+    )
+  },
+];
+
+const TRANSITIONS = {
+  fade: {
+    enter: { from: { opacity:0 }, to: { opacity:1 } },
+    exit:  { from: { opacity:1 }, to: { opacity:0 } },
+    duration: 400,
+    label: 'Fade'
+  },
+  slide: {
+    enter: { from: { opacity:0, transform:'translateX(40px)' }, to: { opacity:1, transform:'translateX(0)' } },
+    exit:  { from: { opacity:1, transform:'translateX(0)' }, to: { opacity:0, transform:'translateX(-40px)' } },
+    duration: 380,
+    label: 'Slide →'
+  },
+  rise: {
+    enter: { from: { opacity:0, transform:'translateY(30px)' }, to: { opacity:1, transform:'translateY(0)' } },
+    exit:  { from: { opacity:1, transform:'translateY(0)' }, to: { opacity:0, transform:'translateY(-20px)' } },
+    duration: 380,
+    label: 'Rise ↑'
+  },
+};
+
+function PageTransitionDemo() {
+  const [current, setCurrent] = React.useState(0);
+  const [transType, setTransType] = React.useState('fade');
+  const [phase, setPhase] = React.useState('idle'); // idle | exiting | entering
+  const [displayed, setDisplayed] = React.useState(0);
+  const [pendingIdx, setPendingIdx] = React.useState(null);
+
+  const tr = TRANSITIONS[transType];
+
+  const goTo = (idx) => {
+    if (idx === current || phase !== 'idle') return;
+    setPendingIdx(idx);
+    setPhase('exiting');
+    setTimeout(() => {
+      setDisplayed(idx);
+      setCurrent(idx);
+      setPhase('entering');
+      setTimeout(() => setPhase('idle'), tr.duration);
+    }, tr.duration);
+  };
+
+  const exitStyle = phase === 'exiting' ? {
+    ...tr.exit.to,
+    transition: `all ${tr.duration}ms cubic-bezier(0.4,0,0.2,1)`,
+  } : {};
+
+  const enterStyle = phase === 'entering' ? {
+    ...tr.enter.to,
+    transition: `all ${tr.duration}ms cubic-bezier(0.4,0,0.2,1)`,
+  } : phase === 'idle' ? {} : tr.enter.from;
+
+  const pageStyle = phase === 'exiting' ? exitStyle : enterStyle;
+  const page = pages[displayed];
+
+  return (
+    <div>
+      <div className="page-demo-controls">
+        {pages.map((p, i) => (
+          <button key={p.id} className={`ctrl-btn ${current === i ? 'active' : ''}`} onClick={() => goTo(i)}>{p.label}</button>
+        ))}
+        <div style={{marginLeft:'auto', display:'flex', gap:'0.5rem'}}>
+          {Object.entries(TRANSITIONS).map(([key, val]) => (
+            <button key={key} className={`ctrl-btn ctrl-btn-gold ${transType === key ? 'active' : ''}`} onClick={() => setTransType(key)}>{val.label}</button>
+          ))}
+        </div>
+      </div>
+      <div className="page-demo" style={{background: page.color}}>
+        <div style={{...pageStyle, height:'100%', minHeight:220}}>
+          {page.content}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════════════════════ */
+function App() {
+  return (
+    <div className="shell">
+      <div className="shell-title">Gestor360® — Motion Design</div>
+      <div className="shell-heading">Animações <span>&amp; Transições</span></div>
+
+      {/* 1. HERO */}
+      <div className="anim-block">
+        <div className="anim-label">
+          <span className="anim-label-name">01</span> — Hero Animation
+        </div>
+        <div className="anim-desc">
+          Os dígitos <strong>3</strong> (cinza), <strong>6</strong> (azul) e <strong>0</strong> (dourado) entram em sequência com bounce. "GESTOR" desliza da esquerda. Linha de acento, subtítulo e CTAs revelam em cascata.
+        </div>
+        <div className="hero-stage-wrap">
+          <Stage duration={5} background="transparent" width={960} height={380}
+            style={{display:'block', width:'100%', height:'auto'}}>
+            <HeroAnimation />
+          </Stage>
+        </div>
+      </div>
+
+      {/* 2. SCROLL REVEAL */}
+      <div className="anim-block">
+        <div className="anim-label">
+          <span className="anim-label-name">02</span> — Card Scroll Reveal
+        </div>
+        <div className="anim-desc">
+          Cada card de ferramenta entra com <strong>fade-in + translateY</strong> ao cruzar o viewport. Stagger de 90ms entre cards para sensação de revelação progressiva.
+        </div>
+        <div className="scroll-demo">
+          <div className="scroll-demo-grid">
+            {tools.map((tool, i) => (
+              <ScrollRevealCard key={tool.n} tool={tool} index={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. PAGE TRANSITIONS */}
+      <div className="anim-block">
+        <div className="anim-label">
+          <span className="anim-label-name">03</span> — Transições de Página
+        </div>
+        <div className="anim-desc">
+          Três variantes de transição. <strong>Fade</strong> — suave e universal. <strong>Slide →</strong> — direcional, ideal para navegação linear. <strong>Rise ↑</strong> — sofisticada, boa para conteúdo editorial.
+        </div>
+        <PageTransitionDemo />
+      </div>
+
+      {/* USAGE NOTE */}
+      <div style={{background:'var(--ink)', borderRadius:12, padding:'1.5rem 2rem', marginTop:'1rem'}}>
+        <div style={{fontFamily:"'gotham',sans-serif", fontWeight:600, fontSize:'0.72rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'1rem'}}>Implementação no Next.js</div>
+        <pre style={{fontFamily:'monospace', fontSize:'0.8rem', color:'rgba(255,255,255,0.7)', lineHeight:1.75, overflowX:'auto'}}>{
+`// Hero — Framer Motion (recomendado para Next.js)
+<motion.div
+  initial={{ y: 60, opacity: 0, scale: 0.6 }}
+  animate={{ y: 0, opacity: 1, scale: 1 }}
+  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+>
+  360
+</motion.div>
+
+// Scroll reveal — variante com Framer Motion
+const cardVariants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: (i) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.09, duration: 0.5, ease: "easeOut" }
+  })
+};
+
+// Page transitions — app/layout.tsx com AnimatePresence
+<AnimatePresence mode="wait">
+  <motion.div key={pathname}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -16 }}
+    transition={{ duration: 0.38 }}
+  >
+    {children}
+  </motion.div>
+</AnimatePresence>`
+        }</pre>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

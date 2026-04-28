@@ -1,7 +1,7 @@
 # Gestor360® — Site Oficial do Método
 
-> Guia de contexto para Claude Code, Claude Design e qualquer IA que trabalhe neste projeto.
-> Leia este arquivo antes de qualquer tarefa.
+> Guia de contexto para Claude Code, Cowork e qualquer IA que trabalhe neste projeto.
+> **Leia este arquivo antes de qualquer tarefa.**
 
 ---
 
@@ -10,6 +10,7 @@
 Site oficial do **método Gestor360®** — plataforma de liderança consciente para pequenos e médios empresários brasileiros. O site é o hub digital de um ecossistema que inclui o livro _Manual do Gestor360®_ (DDM Editora, 2026), 31 ferramentas práticas em PDF, mentoria, treinamentos e comunidade de leitores.
 
 **Não é a página de um livro. É a plataforma de um método.**
+**Não é um site estático. É um CMS headless próprio.**
 
 ---
 
@@ -17,129 +18,267 @@ Site oficial do **método Gestor360®** — plataforma de liderança consciente 
 
 - **Flávio Di Morais** — CEO da DDM Editora, fundador do método Gestor360®, @oCaraDoLivro
 - **Marcelo Caetano** — Co-autor, especialista em gestão estratégica para PMEs
-- **Daiana Di Morais** — Diretora de arte, responsável pela identidade visual do livro e do site
+- **Daiana Di Morais** — Diretora de arte, responsável pela identidade visual (livro + site)
 
 ---
 
 ## Stack técnica
 
-| Camada         | Tecnologia                      | Status        |
-| -------------- | ------------------------------- | ------------- |
-| Framework      | Next.js 14 (App Router)         | ✅ Definido   |
-| Banco de dados | Supabase (PostgreSQL)           | ✅ Definido   |
-| Linguagem      | TypeScript                      | ✅ Definido   |
-| Estilização    | Tailwind CSS                    | ✅ Definido   |
-| Deploy         | Vercel                          | ✅ Definido   |
-| E-mail         | Resend + react-email            | ✅ Definido   |
-| CMS (blog)     | Keystatic                       | ✅ Definido   |
-| Design System  | Claude Design (tokens Tailwind) | 🔄 Em criação |
+| Camada         | Tecnologia                            | Status       |
+| -------------- | ------------------------------------- | ------------ |
+| Framework      | Next.js 16 (App Router)               | ✅ Definido  |
+| Banco de dados | Supabase (PostgreSQL)                 | ✅ Definido  |
+| Linguagem      | TypeScript                            | ✅ Definido  |
+| Estilização    | Tailwind CSS v4                       | ✅ Definido  |
+| Deploy         | Vercel                                | ✅ Definido  |
+| E-mail         | Resend + react-email                  | ✅ Definido  |
+| Animações      | Framer Motion                         | ✅ Definido  |
+| CMS            | Headless próprio (Next.js + Supabase) | ✅ Definido  |
+| Design System  | Claude Design — entregue              | ✅ Concluído |
 
 **Não usar WordPress. Não usar PHP. Não usar MySQL.**
 O Supabase já é a base de dados do SaaS interno da DDM — manter consistência.
 
 ---
 
-## Estrutura de páginas
+## Arquitetura — CMS Headless Próprio
+
+Este projeto **não usa páginas fixas em Next.js**. As páginas são montadas dinamicamente a partir de seções armazenadas no Supabase. O painel admin permite criar, editar, reordenar e publicar páginas sem código.
+
+### Como funciona
 
 ```
-/                    → Home
-/livro               → Página do livro (sinopse, onde comprar)
-/ferramentas         → 31 ferramentas por capítulo (acesso via cadastro)
-/metodo              → O Gestor360® explicado como sistema
-/mentoria            → Palestras, workshops, mentoria individual
-/sobre               → Flávio Di Morais e Marcelo Caetano
-/blog                → Posts (gerenciados via Keystatic)
-/blog/[slug]         → Post individual
-/comunidade          → Área restrita para leitores (fase 2)
+Painel Admin (/admin)
+  → CRUD de páginas (slug, título, status)
+  → CRUD de seções por página (tipo, ordem, conteúdo JSON)
+  → Publicar / Rascunho
+  → Visualizar leads capturados
+
+Site Público (/[slug])
+  → Busca a página pelo slug no Supabase
+  → Busca as seções da página (ordenadas)
+  → Para cada seção, renderiza o componente pelo tipo
+  → Retorna 404 se slug não existe ou status = draft
+```
+
+### Tipos de seção disponíveis
+
+| Tipo          | Componente               | Descrição                                            |
+| ------------- | ------------------------ | ---------------------------------------------------- |
+| `hero`        | `HeroSection.tsx`        | Título grande, subtítulo, CTA, imagem/vídeo de fundo |
+| `text`        | `TextSection.tsx`        | Título + corpo em markdown, alinhamento, bg          |
+| `cards`       | `CardsSection.tsx`       | Grid de cards com ícone, título, descrição           |
+| `ferramentas` | `FerramentasSection.tsx` | Lista de ferramentas por capítulo com download       |
+| `form`        | `FormSection.tsx`        | Formulário dinâmico ligado ao Supabase leads         |
+| `faq`         | `FAQSection.tsx`         | Accordion de perguntas e respostas                   |
+| `cta`         | `CTASection.tsx`         | Fundo colorido, texto central, botão                 |
+| `depoimentos` | `DepoimentosSection.tsx` | Grid/carrossel de depoimentos                        |
+| `capitulos`   | `CapitulosSection.tsx`   | Os 10 capítulos do método em cards                   |
+| `autores`     | `AutoresSection.tsx`     | Perfil dos autores com foto e bio                    |
+
+### Estrutura de rotas
+
+```
+/                    → slug: "home" (página especial)
+/[slug]              → renderização dinâmica pelo CMS
+/livro               → slug: "livro"
+/ferramentas         → slug: "ferramentas"
+/metodo              → slug: "metodo"
+/mentoria            → slug: "mentoria"
+/sobre               → slug: "sobre"
+/blog                → listagem de posts
+/blog/[slug]         → post individual
+/landing/[slug]      → landing pages de campanhas
+
+/admin               → painel admin (protegido por Supabase Auth)
+/admin/paginas       → lista de páginas
+/admin/paginas/[id]  → editor de seções
+/admin/leads         → tabela de leads capturados
+/admin/ferramentas   → CRUD das ferramentas por capítulo
 ```
 
 ---
 
 ## Banco de dados — Supabase
 
-### Tabelas principais
+### Schema completo
 
 ```sql
--- Leads capturados pelo site
-leads (
-  id          uuid primary key default gen_random_uuid(),
-  nome        text not null,
-  email       text not null unique,
-  whatsapp    text,
-  capitulo_origem integer,        -- qual QR Code originou o cadastro (1-10)
-  tem_codigo_livro boolean default false,
-  created_at  timestamptz default now()
-)
+-- ─── PÁGINAS ─────────────────────────────────────────────────────────────
+CREATE TABLE pages (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug        text UNIQUE NOT NULL,
+  title       text NOT NULL,
+  description text,
+  og_image    text,
+  status      text DEFAULT 'draft' CHECK (status IN ('draft','published')),
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);
 
--- 31 ferramentas organizadas por capítulo
-ferramentas (
-  id          uuid primary key default gen_random_uuid(),
-  numero      integer not null,   -- F01 a F31
-  nome        text not null,
-  descricao   text,
-  capitulo    integer not null,   -- 1 a 10
-  arquivo_path text not null,     -- path no Supabase Storage
-  acesso      text default 'gratuito' -- 'gratuito' | 'codigo_livro'
-)
+-- ─── SEÇÕES DE PÁGINA ────────────────────────────────────────────────────
+CREATE TABLE page_sections (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_id     uuid NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+  type        text NOT NULL,
+  order_index integer NOT NULL DEFAULT 0,
+  content     jsonb NOT NULL DEFAULT '{}',
+  visible     boolean DEFAULT true,
+  created_at  timestamptz DEFAULT now()
+);
+CREATE INDEX ON page_sections(page_id, order_index);
 
--- Posts do blog (gerenciados via Keystatic / MDX)
--- Keystatic armazena em /content/posts/*.mdx no repositório
--- Não precisa de tabela no Supabase
+-- ─── LEADS ───────────────────────────────────────────────────────────────
+CREATE TABLE leads (
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome             text NOT NULL,
+  email            text NOT NULL,
+  whatsapp         text,
+  form_id          text,
+  capitulo_origem  integer,       -- 1-10, de qual QR Code veio
+  tem_codigo_livro boolean DEFAULT false,
+  metadata         jsonb DEFAULT '{}',
+  created_at       timestamptz DEFAULT now()
+);
+CREATE UNIQUE INDEX ON leads(email);
 
--- Depoimentos exibidos no site
-depoimentos (
-  id          uuid primary key default gen_random_uuid(),
-  nome        text not null,
-  cargo       text,
-  empresa     text,
-  texto       text not null,
-  foto_url    text,
-  aprovado    boolean default false,
-  created_at  timestamptz default now()
-)
+-- ─── FORMULÁRIOS DINÂMICOS ────────────────────────────────────────────────
+CREATE TABLE forms (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name         text NOT NULL,
+  fields       jsonb NOT NULL DEFAULT '[]',
+  redirect_url text,
+  created_at   timestamptz DEFAULT now()
+);
+
+-- ─── FERRAMENTAS ─────────────────────────────────────────────────────────
+CREATE TABLE ferramentas (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  numero       integer NOT NULL,
+  nome         text NOT NULL,
+  descricao    text,
+  capitulo     integer NOT NULL,
+  arquivo_path text NOT NULL,
+  acesso       text DEFAULT 'gratuito' CHECK (acesso IN ('gratuito','codigo_livro'))
+);
+
+-- ─── DEPOIMENTOS ─────────────────────────────────────────────────────────
+CREATE TABLE depoimentos (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome       text NOT NULL,
+  cargo      text,
+  empresa    text,
+  texto      text NOT NULL,
+  foto_url   text,
+  aprovado   boolean DEFAULT false,
+  created_at timestamptz DEFAULT now()
+);
 ```
 
-### Storage
+### Storage (Supabase)
 
 ```
-bucket: ferramentas-pdf
-  /capitulo-01/F01-GST.pdf
-  /capitulo-01/F02-PESTEL.pdf
-  /capitulo-01/F03-SWOT-Comportamental.pdf
-  ...
-  /capitulo-10/F29-Canvas-Inovacao-Agil.pdf
+bucket: ferramentas-pdf  (privado — acesso via signed URL 1h)
+  /capitulo-01/F01-GST.pdf  ...  /capitulo-10/F29-Canvas-Inovacao.pdf
 
-Acesso: signed URLs com expiração de 1 hora
-RLS: leads com tem_codigo_livro = true acessam todas
-     leads com tem_codigo_livro = false acessam apenas ferramentas com acesso = 'gratuito'
+bucket: assets  (público)
+  /og-images/   /autores/   /depoimentos/
+```
+
+### RLS (Row Level Security)
+
+```sql
+-- Leads: público insere, admin lê
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "insert_lead" ON leads FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "admin_read"  ON leads FOR SELECT TO authenticated USING (true);
+
+-- Ferramentas: anon lê gratuitas, autenticado lê todas
+ALTER TABLE ferramentas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_free" ON ferramentas FOR SELECT TO anon USING (acesso = 'gratuito');
+CREATE POLICY "auth_all"    ON ferramentas FOR SELECT TO authenticated USING (true);
+
+-- Páginas: anon lê published, admin faz tudo
+ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_published" ON pages FOR SELECT TO anon USING (status = 'published');
+CREATE POLICY "admin_all"        ON pages FOR ALL TO authenticated USING (true);
+
+-- Seções: seguem política da página
+ALTER TABLE page_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_sections" ON page_sections FOR SELECT TO anon USING (visible = true);
+CREATE POLICY "admin_sections"  ON page_sections FOR ALL TO authenticated USING (true);
 ```
 
 ---
 
-## Identidade visual
+## Design System — Tokens (Tailwind v4)
 
-```ts
-colors: {
-  brand: {
-    Blue:    '#1B3A6B',
-    Orange:  '#daae5d',
-    Black:   '#000000',
-    White:   '#FFFFFF',
-    Dourado  '#bfb3a7',
+Arquivo gerado pelo Claude Design: `styles/gestor360-tokens.css`
 
-  }
+```css
+@theme {
+  /* Cores — extraídas da capa do livro */
+  --color-brand-blue: #1f3f7a; /* "evoluir" — o 6 */
+  --color-brand-gold: #d4a020; /* "prosperar" — o 0 */
+  --color-brand-stone: #8b8b8b; /* "inspirar" — o 3 */
+  --color-bg-canvas: #e8e6e1; /* fundo da capa */
+  --color-bg-white: #ffffff;
+  --color-bg-ink: #1a1a1a; /* footer e hero dark */
+  --color-text-title: #1a1a1a;
+  --color-text-body: #5a5a5a;
+  --color-text-muted: #8b8b8b;
+  --color-border: #d8d5cf;
+
+  /* Tipografia — mesma da capa */
+  --font-display: "gotham", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 2px 8px 0 oklch(0% 0 0 / 0.08);
+  --shadow-md: 0 4px 20px 0 oklch(0% 0 0 / 0.1);
+  --shadow-blue: 0 4px 20px 0 oklch(30% 0.12 260 / 0.25);
+  --shadow-gold: 0 4px 20px 0 oklch(65% 0.12 70 / 0.3);
 }
 ```
 
-### Tipografia
+### Componentes do Design System
 
-- **Títulos:** Fonte serifa (a definir pelo Claude Design — baseada na capa do livro)
-- **Corpo:** Inter ou similar sans-serif limpa
-- **Tom visual:** Autoridade + calor. Método sério, alma presente. Não frio, não corporativo.
+| Arquivo               | Componente                                   |
+| --------------------- | -------------------------------------------- |
+| `Button.tsx`          | Primário (azul), Secundário (outline), Ghost |
+| `Logo.tsx`            | SVG com variantes light/dark                 |
+| `Badge.tsx`           | Azul, dourado, neutro                        |
+| `ToolCard.tsx`        | Card de ferramenta com badge de capítulo     |
+| `LeadForm.tsx`        | Formulário react-hook-form + zod             |
+| `TestimonialCard.tsx` | Card de depoimento                           |
+| `Header.tsx`          | Navegação principal                          |
+| `Footer.tsx`          | Footer dark 3 colunas                        |
 
-### Frase de impacto do método
+### Animações (Framer Motion)
 
-> "O método que une razão e alma para transformar quem lidera — e, por isso, transforma a empresa."
+```tsx
+// Hero: os três dígitos do 360 entram em sequência
+// 3 (stone) → delay 0.2s | 6 (blue) → delay 0.4s | 0 (gold) → delay 0.6s
+
+// Cards: fade + slide up com stagger de 0.1s ao entrar na viewport
+const fadeInUp = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" },
+};
+
+// Transições de página: opacity 0→1, 300ms
+```
+
+**Regra:** Animações APENAS em hero, scroll reveal de cards e transições de página.
+Sem parallax. Sem animações de loading. Sem excessos.
 
 ---
 
@@ -147,132 +286,154 @@ colors: {
 
 ```
 QR Code do livro (capítulo X)
-  → /ferramentas?capitulo=X
-    → Formulário: nome + e-mail (obrigatório) + WhatsApp (opcional)
-      → Salva lead no Supabase com capitulo_origem = X
-        → Resend dispara e-mail de boas-vindas
-          → Lead acessa ferramentas gratuitas do capítulo
-            → CTA para inserir código do livro → libera todas as 31 ferramentas
+  → /ferramentas?capitulo=X&utm_source=livro&utm_medium=qrcode&utm_campaign=capXX
+    → FormSection com capitulo pré-selecionado
+      → POST /api/leads
+        → Salva: nome + email + whatsapp + capitulo_origem + metadata UTM
+          → Resend: e-mail de boas-vindas com link das ferramentas
+            → Ferramentas gratuitas liberadas
+              → CTA: inserir código do livro → acesso completo (todas as 31)
 ```
 
-**Regra de negócio importante:** Sempre salvar `capitulo_origem` — identifica qual dor o leitor tem.
+**Regra crítica:** Sempre salvar `capitulo_origem`. É o dado mais valioso da base.
 
 ---
 
-## QR Codes — UTMs por capítulo
+## Painel Admin
 
-Cada capítulo do livro tem um QR Code que aponta para:
-
-```
-https://ogestor360.com/ferramentas?capitulo=1&utm_source=livro&utm_medium=qrcode&utm_campaign=cap01
+### Telas necessárias
 
 ```
+/admin                     Dashboard (métricas: leads, páginas, ferramentas)
+/admin/paginas             Lista com slug, título, status, ações
+/admin/paginas/nova        Criar página (slug + título + descrição)
+/admin/paginas/[id]        Editor: lista de seções, reordenar, adicionar
+/admin/paginas/[id]/secoes/nova   Escolher tipo + preencher conteúdo JSON
+/admin/leads               Tabela filtrada por capítulo/data, exportar CSV
+/admin/ferramentas         CRUD: upload PDF, nome, capítulo, tipo de acesso
+/admin/depoimentos         Aprovar/reprovar depoimentos
+```
 
-O parâmetro `capitulo` é lido na página e pré-seleciona o capítulo correto. O `utm_campaign` é registrado no Google Analytics 4.
+### Proteção
+
+```typescript
+// middleware.ts
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (pathname.startsWith("/admin")) {
+    // verificar sessão Supabase — redirecionar para /login se não autenticado
+  }
+}
+```
 
 ---
 
-## E-mail de boas-vindas (Resend)
-
-Disparado imediatamente após o cadastro:
-
-```
-Assunto: Suas ferramentas do Gestor360® estão aqui
-De: noreply@ogestor360.com
-Para: {email do lead}
-
-Conteúdo:
-1. Boas-vindas pelo nome
-2. Link direto para as ferramentas do capítulo de origem
-3. Instrução para inserir o código do livro (acesso completo)
-4. Assinatura: Flávio Di Morais e Marcelo Caetano
-```
-
-Template em `/emails/boas-vindas.tsx` usando react-email.
-
----
-
-## Estrutura de pastas (convenção)
+## Estrutura de pastas
 
 ```
 /
 ├── app/
-│   ├── (site)/              # Grupo de rotas públicas
-│   │   ├── page.tsx         # Home
-│   │   ├── livro/page.tsx
-│   │   ├── ferramentas/page.tsx
-│   │   ├── metodo/page.tsx
-│   │   ├── mentoria/page.tsx
-│   │   ├── sobre/page.tsx
-│   │   └── blog/
-│   │       ├── page.tsx
-│   │       └── [slug]/page.tsx
+│   ├── (site)/
+│   │   ├── page.tsx               # Home (slug: 'home')
+│   │   ├── [slug]/page.tsx        # Renderizador CMS dinâmico
+│   │   ├── blog/page.tsx
+│   │   ├── blog/[slug]/page.tsx
+│   │   └── layout.tsx             # Header + Footer
+│   ├── (admin)/
+│   │   ├── admin/
+│   │   │   ├── page.tsx           # Dashboard
+│   │   │   ├── paginas/
+│   │   │   ├── leads/
+│   │   │   ├── ferramentas/
+│   │   │   └── depoimentos/
+│   │   └── layout.tsx             # Sidebar admin
 │   └── api/
-│       ├── leads/route.ts   # POST: salvar lead
-│       └── ferramentas/route.ts # GET: listar por capítulo
+│       ├── leads/route.ts
+│       ├── ferramentas/route.ts
+│       └── pages/[slug]/route.ts
 ├── components/
-│   ├── ui/                  # Componentes base do design system
-│   └── sections/            # Seções das páginas (Hero, Features, etc.)
-├── content/
-│   └── posts/               # Arquivos .mdx gerenciados pelo Keystatic
-├── emails/
-│   └── boas-vindas.tsx      # Template react-email
+│   ├── ui/                        # Design system
+│   ├── sections/                  # Um arquivo por tipo de seção
+│   │   ├── SectionRenderer.tsx    # Switch central por tipo
+│   │   ├── HeroSection.tsx
+│   │   ├── TextSection.tsx
+│   │   ├── CardsSection.tsx
+│   │   ├── FerramentasSection.tsx
+│   │   ├── FormSection.tsx
+│   │   ├── FAQSection.tsx
+│   │   ├── CTASection.tsx
+│   │   ├── DepoimentosSection.tsx
+│   │   ├── CapitulosSection.tsx
+│   │   └── AutoresSection.tsx
+│   └── admin/
+│       ├── SectionEditor.tsx
+│       ├── PageEditor.tsx
+│       └── LeadsTable.tsx
 ├── lib/
-│   ├── supabase.ts          # Cliente Supabase
-│   └── resend.ts            # Cliente Resend
+│   ├── supabase/
+│   │   ├── client.ts              # Browser
+│   │   ├── server.ts              # Server (App Router)
+│   │   └── types.ts               # supabase gen types typescript
+│   └── resend.ts
+├── emails/
+│   └── boas-vindas.tsx
+├── styles/
+│   ├── globals.css
+│   └── gestor360-tokens.css       # Tokens do design system
 ├── types/
-│   └── index.ts             # Tipos TypeScript do projeto
-├── tailwind.config.ts       # Design tokens (gerado pelo Claude Design)
-├── CLAUDE.md                # Este arquivo
-└── .env.local               # Variáveis de ambiente (não versionar)
+│   └── cms.ts                     # SectionType, PageSection, SectionContent...
+├── middleware.ts                  # Proteção /admin
+├── CLAUDE.md                      # Este arquivo
+└── .env.local
 ```
 
 ---
 
-## Variáveis de ambiente necessárias
+## Variáveis de ambiente
 
 ```bash
-# Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-
-# Resend (e-mail)
 RESEND_API_KEY=
-
-# Código de acesso ao livro (validação simples no início)
+RESEND_FROM_EMAIL=noreplyo@gestor360.com
 CODIGO_LIVRO_SECRET=
-
-# Analytics
 NEXT_PUBLIC_GA_ID=
+NEXT_PUBLIC_META_PIXEL_ID=
+ADMIN_EMAIL=
 ```
 
 ---
 
-## Regras para a IA (Claude Code, v0, Cursor)
+## Regras para a IA (Claude Code, Cowork)
 
-1. **Sempre usar TypeScript** — sem arquivos `.js` no projeto
-2. **Sempre usar Tailwind** — sem CSS modules, sem styled-components
-3. **Nunca hardcodar cores** — usar os tokens do `tailwind.config.ts`
-4. **Componentes server-first** — usar Client Components só quando necessário (interatividade)
-5. **Formulários com validação** — usar react-hook-form + zod
-6. **Supabase via lib/supabase.ts** — nunca instanciar o cliente diretamente nos componentes
-7. **Textos em português** — o site é 100% em pt-BR
-8. **Acessibilidade** — sempre incluir `alt` em imagens, `aria-label` em botões sem texto
-9. **SEO** — cada página tem `metadata` com title e description específicos
-10. **Mobile first** — o público do livro acessa principalmente pelo celular (QR Code)
+1. **Sempre TypeScript** — sem `.js` no projeto
+2. **Sempre Tailwind v4** — sem CSS modules, sem styled-components
+3. **Nunca hardcodar cores** — usar tokens de `gestor360-tokens.css`
+4. **Server Components por padrão** — Client Component só para interatividade real
+5. **Formulários** — react-hook-form + zod sempre
+6. **Supabase** — via `lib/supabase/client.ts` (browser) ou `lib/supabase/server.ts` (server)
+7. **Textos** — 100% em pt-BR
+8. **Acessibilidade** — `alt` em imagens, `aria-label` em botões sem texto visível
+9. **SEO** — `metadata` de cada página vem do Supabase (title, description, og_image)
+10. **Mobile first** — público acessa pelo celular via QR Code
+11. **Animações** — Framer Motion apenas: hero 360, scroll reveal de cards, transições de página
+12. **CMS** — nunca criar conteúdo fixo no código — usar o sistema de seções do Supabase
+13. **Admin** — toda rota `/admin/*` protegida pelo middleware com Supabase Auth
 
 ---
 
-## Contexto editorial (para gerar textos e componentes)
+## Contexto editorial
 
-### Sobre o método Gestor360®
+### Frase de impacto
 
-Sistema vivo de liderança que opera em 3 dimensões simultâneas:
+> "O método que une razão e alma para transformar quem lidera — e, por isso, transforma a empresa."
 
-- **Técnica:** GST, PESTEL, SWOT, OKR, PDCA, DRE, Fluxo de Caixa, Matriz de Risco
-- **Neurociência/PNL:** rapport, metamodelo, reframing, Liderança Situacional, Kahneman, Amabile
-- **Filosófico-espiritual:** propósito, autoconhecimento, consciência, presença
+### As três cores do 360 têm significado
+
+- **Cinza `#8B8B8B`** = técnica e método ("inspirar")
+- **Azul `#1F3F7A`** = consciência e evolução ("evoluir")
+- **Dourado `#D4A020`** = resultado e prosperidade ("prosperar")
 
 ### As 31 ferramentas por capítulo
 
@@ -289,40 +450,35 @@ Sistema vivo de liderança que opera em 3 dimensões simultâneas:
 | 9    | Autoaprendizado   | Canvas de Autoaprendizado do Líder360                                                           |
 | 10   | Indicadores       | Painel de Indicadores · OKRs · PDCA · Canvas da Inovação Ágil                                   |
 
-### Tom de voz do site
-
-- Direto e concreto — sem jargão vazio
-- Humano e próximo — fala com o empresário, não para ele
-- Autoridade com humildade — sabe muito, não se vangloria
-- Inspirador sem ser motivacional vazio
-
 ---
 
 ## Roadmap
 
-### Fase 1 — MVP (semanas 1–3)
+### Fase 1 — Fundação (semanas 1–2)
 
-- [ ] Design system gerado pelo Claude Design
-- [ ] Setup Next.js + Supabase + Tailwind + Vercel
-- [ ] Páginas: Home, Livro, Ferramentas (com cadastro), Sobre
-- [ ] Blog estruturado com Keystatic (sem posts ainda)
-- [ ] Formulário de leads funcionando
-- [ ] QR Codes apontando para o site
-- [ ] E-mail de boas-vindas via Resend
+- [ ] Setup Next.js 16 + Supabase + Tailwind v4 + Vercel
+- [ ] SQL do schema + RLS no Supabase
+- [ ] `gestor360-tokens.css` + componentes do design system
+- [ ] `SectionRenderer.tsx` com tipos: hero, text, cta
+- [ ] Rota `/[slug]` renderizando do Supabase
+- [ ] `/api/leads` + e-mail de boas-vindas (Resend)
 
-### Fase 2 — Conteúdo (mês 2)
+### Fase 2 — CMS completo (semanas 3–4)
 
-- [ ] Página "O Método"
-- [ ] Página de Mentoria e Treinamentos
-- [ ] 4 primeiros posts do blog
-- [ ] Integração WhatsApp (Zapier ou Z-API)
-- [ ] Google Analytics 4 com UTMs por capítulo
+- [ ] Todos os 10 tipos de seção
+- [ ] Painel admin: login, páginas, editor de seções
+- [ ] Upload PDFs das ferramentas no Storage
+- [ ] Seção `ferramentas` com controle de acesso
+- [ ] QR Codes com UTM rastreando `capitulo_origem`
+- [ ] Animações Framer Motion
 
-### Fase 3 — Comunidade (mês 3+)
+### Fase 3 — Conteúdo e comunidade (mês 2–3)
 
-- [ ] Área restrita para leitores com código do livro
-- [ ] Sessões ao vivo mensais
-- [ ] E-commerce de treinamentos online
+- [ ] Blog (admin ou Keystatic)
+- [ ] Mentoria e treinamentos
+- [ ] Integração WhatsApp
+- [ ] Área restrita para leitores
+- [ ] Google Analytics 4 + Meta Pixel
 
 ---
 
