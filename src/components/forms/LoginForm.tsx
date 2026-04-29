@@ -32,9 +32,11 @@ export function LoginForm() {
   const [error, setError] = useState(
     initialError === 'unauthorized'
       ? 'Este e-mail não tem permissão para acessar o admin. Solicite acesso ao administrador.'
-      : initialError === 'link-invalido'
-        ? 'O link de confirmação é inválido ou expirou. Tente novamente.'
-        : ''
+      : initialError === 'link-expirado'
+        ? 'O link expirou. Solicite um novo link de redefinição de senha.'
+        : initialError === 'link-invalido'
+          ? 'O link de confirmação é inválido ou expirou. Tente novamente.'
+          : ''
   )
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)

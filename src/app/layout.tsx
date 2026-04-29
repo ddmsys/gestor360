@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DM_Sans } from 'next/font/google'
+import { AuthErrorRedirect } from '@/components/AuthErrorRedirect'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -38,6 +39,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://use.typekit.net/pwr2rya.css" />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <AuthErrorRedirect />
         {children}
       </body>
     </html>
