@@ -309,9 +309,9 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
           SEO
         </button>
 
-        {/* Visualizar */}
+        {/* Visualizar — preview autenticado que mostra draft + published */}
         <a
-          href={`/${page.slug}`}
+          href={`/preview/${page.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 border border-white/20 rounded-[var(--radius-md)] hover:bg-white/10 transition-colors"

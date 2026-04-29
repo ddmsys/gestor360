@@ -145,6 +145,23 @@ export function CardsContentEditor({ content, onChange }: ContentEditorProps) {
                 multiline
                 rows={2}
               />
+              <TextInput
+                value={card.badge ?? ''}
+                onChange={(v) => updateCard(idx, { badge: v || undefined })}
+                placeholder="Badge (ex: Novo, em breve…)"
+              />
+              <TextInput
+                value={card.link_label ?? ''}
+                onChange={(v) => updateCard(idx, { link_label: v || undefined })}
+                placeholder="Texto do link (ex: Saiba mais)"
+              />
+              {card.link_label && (
+                <TextInput
+                  value={card.link_url ?? ''}
+                  onChange={(v) => updateCard(idx, { link_url: v || undefined })}
+                  placeholder="URL do link (/pagina ou https://…)"
+                />
+              )}
             </div>
           </div>
         ))}

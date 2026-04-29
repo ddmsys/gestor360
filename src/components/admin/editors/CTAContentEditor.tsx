@@ -104,6 +104,41 @@ export function CTAContentEditor({ content, onChange }: ContentEditorProps) {
           />
         </FieldGroup>
       </EditorSection>
+
+      <EditorDivider />
+
+      <EditorSection>
+        <FieldGroup label="Imagem lateral (URL)">
+          <TextInput
+            value={c.image_url ?? ''}
+            onChange={(v) => set('image_url', v || undefined)}
+            placeholder="https://… ou /assets/foto.jpg"
+          />
+        </FieldGroup>
+
+        {c.image_url && (
+          <>
+            <FieldGroup label="Texto alternativo da imagem">
+              <TextInput
+                value={c.image_alt ?? ''}
+                onChange={(v) => set('image_alt', v || undefined)}
+                placeholder="Descrição para acessibilidade"
+              />
+            </FieldGroup>
+
+            <FieldGroup label="Lado da imagem">
+              <SegmentControl
+                options={[
+                  { label: 'Direita', value: 'right' },
+                  { label: 'Esquerda', value: 'left' },
+                ]}
+                value={c.image_side ?? 'right'}
+                onChange={(v) => set('image_side', v as CTAContent['image_side'])}
+              />
+            </FieldGroup>
+          </>
+        )}
+      </EditorSection>
     </div>
   )
 }

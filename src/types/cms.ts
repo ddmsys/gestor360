@@ -54,6 +54,8 @@ export interface HeroContent {
   cta_secondary_url?: string
   variant?: 'dark' | 'canvas' | 'blue'
   bg_image?: string
+  bg_video?: string
+  overlay_opacity?: number
   show_360_animation?: boolean
   align?: 'left' | 'center' | 'right'
 }

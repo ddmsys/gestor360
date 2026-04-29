@@ -78,6 +78,46 @@ export function HeroContentEditor({ content, onChange }: ContentEditorProps) {
       <EditorDivider />
 
       <EditorSection>
+        <FieldGroup label="Imagem de fundo (URL)">
+          <TextInput
+            value={c.bg_image ?? ''}
+            onChange={(v) => set('bg_image', v || undefined)}
+            placeholder="https://… ou /assets/hero.jpg"
+          />
+        </FieldGroup>
+
+        <FieldGroup label="Vídeo de fundo (URL .mp4)">
+          <TextInput
+            value={c.bg_video ?? ''}
+            onChange={(v) => set('bg_video', v || undefined)}
+            placeholder="https://… /assets/hero.mp4"
+          />
+        </FieldGroup>
+
+        {c.bg_image && (
+          <FieldGroup label="Escurecimento da imagem">
+            <div className="flex items-center gap-3 w-full">
+              <input
+                type="range"
+                min={0}
+                max={90}
+                step={5}
+                value={c.overlay_opacity ?? 50}
+                aria-label="Opacidade do escurecimento sobre a imagem de fundo"
+                onChange={(e) => set('overlay_opacity', Number(e.target.value))}
+                className="flex-1 h-1.5 appearance-none bg-border rounded-full accent-(--color-brand-blue)"
+              />
+              <span className="text-[10px] font-mono text-(--color-text-muted) w-8 text-right">
+                {c.overlay_opacity ?? 50}%
+              </span>
+            </div>
+          </FieldGroup>
+        )}
+      </EditorSection>
+
+      <EditorDivider />
+
+      <EditorSection>
         <FieldGroup label="Botão principal">
           <TextInput
             value={c.cta_label ?? ''}

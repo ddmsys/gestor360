@@ -86,6 +86,9 @@ export interface SectionStyle {
    */
   letterSpacing?: number
 
+  /** Transformação do texto do título (caixa alta, baixa, capitalizado). */
+  titleTransform?: 'uppercase' | 'lowercase' | 'capitalize' | 'none'
+
   // ─── ESPAÇAMENTO ─────────────────────────────────────────────────────────
 
   /**

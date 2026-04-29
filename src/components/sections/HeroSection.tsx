@@ -27,6 +27,8 @@ export function HeroSection({ content }: Props) {
     cta_secondary_url,
     variant = 'dark',
     bg_image,
+    bg_video,
+    overlay_opacity = 50,
     show_360_animation = false,
     align = 'center',
   } = content
@@ -44,8 +46,26 @@ export function HeroSection({ content }: Props) {
       className={`relative overflow-hidden ${styles.bg} ${styles.text}`}
       aria-label="Seção hero"
     >
+      {/* Vídeo de fundo */}
+      {bg_video && (
+        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+          <video
+            src={bg_video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover object-center"
+          />
+          <div
+            className="absolute inset-0 bg-black"
+            style={{ opacity: overlay_opacity / 100 }}
+          />
+        </div>
+      )}
+
       {/* Imagem de fundo opcional via next/image */}
-      {bg_image && (
+      {!bg_video && bg_image && (
         <div className="absolute inset-0" aria-hidden="true">
           <Image
             src={bg_image}
@@ -55,7 +75,10 @@ export function HeroSection({ content }: Props) {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="absolute inset-0 bg-black"
+            style={{ opacity: overlay_opacity / 100 }}
+          />
         </div>
       )}
 

@@ -100,6 +100,20 @@ export function StyleTypographyTab({ style, onChange }: Props) {
         )}
       </StyleSection>
 
+      {/* ── Caixa alta / baixa ── */}
+      <StyleSection title="Caixa do título">
+        <StyleSegment
+          options={[
+            { value: 'none',       label: 'Normal'    },
+            { value: 'uppercase',  label: 'MAIÚSC.'   },
+            { value: 'lowercase',  label: 'minúsc.'   },
+            { value: 'capitalize', label: 'Título'    },
+          ]}
+          value={style.titleTransform ?? 'none'}
+          onChange={(v) => onChange({ titleTransform: v !== 'none' ? v : undefined })}
+        />
+      </StyleSection>
+
       {/* ── Letter-spacing ── */}
       <StyleSection title="Espaçamento de letras">
         <StyleSlider

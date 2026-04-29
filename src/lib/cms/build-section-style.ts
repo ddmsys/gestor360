@@ -68,6 +68,9 @@ export function buildSectionStyle(style: SectionStyle = {}): CSSProperties {
       '--section-letter-spacing': style.letterSpacing != null
         ? `${style.letterSpacing}px`
         : undefined,
+      '--section-title-transform': style.titleTransform && style.titleTransform !== 'none'
+        ? style.titleTransform
+        : undefined,
       '--section-max-width':      style.maxWidth
         ? MAX_WIDTH_MAP[style.maxWidth]
         : undefined,
