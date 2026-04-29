@@ -102,14 +102,12 @@ async function ensureFerramentasBucket() {
 
   const exists = buckets.some((b) => b.name === FERRAMENTAS_BUCKET)
 
-  if (exists) {
-    // Atualiza configurações do bucket existente (limite e tipos aceitos)
-    const { error } = await supabaseAdmin.storage.updateBucket(FERRAMENTAS_BUCKET, BUCKET_CONFIG)
-    if (error) throw new Error(error.message)
-  } else {
+  if (!exists) {
     const { error } = await supabaseAdmin.storage.createBucket(FERRAMENTAS_BUCKET, BUCKET_CONFIG)
     if (error) throw new Error(error.message)
   }
+
+  // Para atualizar o bucket manualmente, use: POST /api/admin/bucket/sync
 
   return supabaseAdmin
 }
