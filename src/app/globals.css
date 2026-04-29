@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "../styles/gestor360-tokens.css";
 
 body {

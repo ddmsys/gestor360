@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { href: '/admin/paginas', label: 'Páginas' },
               { href: '/admin/leads', label: 'Leads' },
               { href: '/admin/ferramentas', label: 'Ferramentas' },
+              { href: '/admin/blog', label: 'Blog' },
               { href: '/admin/depoimentos', label: 'Depoimentos' },
               { href: '/admin/design', label: 'Design Studio' },
             ].map(({ href, label }) => (

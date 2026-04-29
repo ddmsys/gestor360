@@ -34,6 +34,15 @@ export async function proxy(request: NextRequest) {
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
       return NextResponse.redirect(loginUrl)
     }
+
+    const allowedEmails = (process.env.ADMIN_EMAILS ?? process.env.ADMIN_EMAIL ?? '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+
+    if (allowedEmails.length > 0 && !allowedEmails.includes(user.email?.toLowerCase() ?? '')) {
+      return NextResponse.redirect(new URL('/login?error=unauthorized', request.url))
+    }
   }
 
   return supabaseResponse
