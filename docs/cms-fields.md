@@ -29,25 +29,25 @@
 // types/cms.ts
 
 export type SectionType =
-  | 'hero'
-  | 'text'
-  | 'cards'
-  | 'ferramentas'
-  | 'form'
-  | 'faq'
-  | 'cta'
-  | 'depoimentos'
-  | 'capitulos'
-  | 'autores'
+  | "hero"
+  | "text"
+  | "cards"
+  | "ferramentas"
+  | "form"
+  | "faq"
+  | "cta"
+  | "depoimentos"
+  | "capitulos"
+  | "autores";
 
 export interface PageSection {
-  id: string
-  page_id: string
-  type: SectionType
-  order_index: number
-  content: SectionContent
-  visible: boolean
-  created_at: string
+  id: string;
+  page_id: string;
+  type: SectionType;
+  order_index: number;
+  content: SectionContent;
+  visible: boolean;
+  created_at: string;
 }
 
 export type SectionContent =
@@ -60,7 +60,7 @@ export type SectionContent =
   | CTAContent
   | DepoimentosContent
   | CapitulosContent
-  | AutoresContent
+  | AutoresContent;
 ```
 
 ---
@@ -73,30 +73,31 @@ export type SectionContent =
 ```typescript
 export interface HeroContent {
   // Obrigatórios
-  title: string              // Ex: "O método que transforma quem lidera"
-  
+  title: string; // Ex: "O método que transforma quem lidera"
+
   // Opcionais
-  subtitle?: string          // Parágrafo abaixo do título
-  cta_label?: string         // Texto do botão principal. Ex: "Acessar ferramentas"
-  cta_url?: string           // Link do botão. Ex: "/ferramentas" ou "#form"
-  cta_secondary_label?: string  // Botão secundário (outline)
-  cta_secondary_url?: string
-  
+  subtitle?: string; // Parágrafo abaixo do título
+  cta_label?: string; // Texto do botão principal. Ex: "Acessar ferramentas"
+  cta_url?: string; // Link do botão. Ex: "/ferramentas" ou "#form"
+  cta_secondary_label?: string; // Botão secundário (outline)
+  cta_secondary_url?: string;
+
   // Visual
-  variant?: 'dark' | 'canvas' | 'blue'  // Default: 'dark'
+  variant?: "dark" | "canvas" | "blue"; // Default: 'dark'
   // dark   = fundo #1A1A1A (hero do livro)
   // canvas = fundo #E8E6E1 (tom da capa)
   // blue   = fundo #1F3F7A (azul da marca)
-  
-  bg_image?: string          // URL de imagem de fundo (Supabase Storage)
-  show_360_animation?: boolean  // Ativa animação "3·6·0". Default: false
-  
+
+  bg_image?: string; // URL de imagem de fundo (Supabase Storage)
+  show_360_animation?: boolean; // Ativa animação "3·6·0". Default: false
+
   // Alinhamento
-  align?: 'left' | 'center' | 'right'  // Default: 'center'
+  align?: "left" | "center" | "right"; // Default: 'center'
 }
 ```
 
 **Exemplo de `content` para a Home:**
+
 ```json
 {
   "title": "O método que une razão e alma para transformar quem lidera",
@@ -121,29 +122,30 @@ export interface HeroContent {
 ```typescript
 export interface TextContent {
   // Obrigatórios
-  body: string               // Markdown suportado: **negrito**, _itálico_, listas, links
+  body: string; // Markdown suportado: **negrito**, _itálico_, listas, links
 
   // Opcionais
-  title?: string             // Título H2 da seção
-  subtitle?: string          // Subtítulo H3 ou parágrafo de apoio
+  title?: string; // Título H2 da seção
+  subtitle?: string; // Subtítulo H3 ou parágrafo de apoio
 
   // Layout
-  align?: 'left' | 'center' | 'right'  // Default: 'left'
-  max_width?: 'sm' | 'md' | 'lg' | 'full'  // Default: 'md' (680px)
+  align?: "left" | "center" | "right"; // Default: 'left'
+  max_width?: "sm" | "md" | "lg" | "full"; // Default: 'md' (680px)
 
   // Visual
-  bg?: 'white' | 'canvas' | 'ink'  // Default: 'white'
+  bg?: "white" | "canvas" | "ink"; // Default: 'white'
   // white  = fundo branco
   // canvas = fundo #E8E6E1
   // ink    = fundo dark (texto invertido)
-  
+
   // Badge/eyebrow acima do título
-  badge?: string             // Ex: "O Método", "Capítulo 1"
-  badge_color?: 'blue' | 'gold' | 'stone'  // Default: 'blue'
+  badge?: string; // Ex: "O Método", "Capítulo 1"
+  badge_color?: "blue" | "gold" | "stone"; // Default: 'blue'
 }
 ```
 
 **Exemplo:**
+
 ```json
 {
   "badge": "O Método",
@@ -165,34 +167,35 @@ export interface TextContent {
 
 ```typescript
 export interface CardItem {
-  icon?: string              // Emoji ou nome de ícone Lucide. Ex: "🎯" ou "target"
-  title: string
-  description: string
-  link_url?: string          // Card clicável — URL destino
-  link_label?: string        // Texto do link. Ex: "Saiba mais"
-  badge?: string             // Badge no card. Ex: "Novo", "Cap. 3"
+  icon?: string; // Emoji ou nome de ícone Lucide. Ex: "🎯" ou "target"
+  title: string;
+  description: string;
+  link_url?: string; // Card clicável — URL destino
+  link_label?: string; // Texto do link. Ex: "Saiba mais"
+  badge?: string; // Badge no card. Ex: "Novo", "Cap. 3"
 }
 
 export interface CardsContent {
   // Obrigatório
-  items: CardItem[]          // Mínimo 2, máximo 12 cards
+  items: CardItem[]; // Mínimo 2, máximo 12 cards
 
   // Cabeçalho da seção
-  title?: string
-  subtitle?: string
-  badge?: string
-  badge_color?: 'blue' | 'gold' | 'stone'
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  badge_color?: "blue" | "gold" | "stone";
 
   // Layout
-  columns?: 2 | 3 | 4       // Default: 3. Mobile sempre 1 coluna.
-  bg?: 'white' | 'canvas' | 'ink'  // Default: 'white'
+  columns?: 2 | 3 | 4; // Default: 3. Mobile sempre 1 coluna.
+  bg?: "white" | "canvas" | "ink"; // Default: 'white'
 
   // Estilo dos cards
-  card_style?: 'bordered' | 'shadow' | 'flat'  // Default: 'shadow'
+  card_style?: "bordered" | "shadow" | "flat"; // Default: 'shadow'
 }
 ```
 
 **Exemplo — "Os 3 Pilares do Método":**
+
 ```json
 {
   "title": "Três dimensões. Um método completo.",
@@ -229,20 +232,20 @@ export interface CardsContent {
 ```typescript
 export interface FerramentasContent {
   // Cabeçalho
-  title?: string             // Default: "Ferramentas do Gestor360®"
-  subtitle?: string
+  title?: string; // Default: "Ferramentas do Gestor360®"
+  subtitle?: string;
 
   // Filtro pré-selecionado
-  capitulo_inicial?: number  // 1–10. Pré-filtra o capítulo na URL ?capitulo=X
-  mostrar_todos?: boolean    // Mostra todos os capítulos ou apenas o selecionado. Default: false
+  capitulo_inicial?: number; // 1–10. Pré-filtra o capítulo na URL ?capitulo=X
+  mostrar_todos?: boolean; // Mostra todos os capítulos ou apenas o selecionado. Default: false
 
   // Layout
-  layout?: 'grid' | 'list'  // Default: 'grid'
+  layout?: "grid" | "list"; // Default: 'grid'
 
   // CTA para código do livro
-  mostrar_cta_codigo?: boolean  // Exibe bloco "Tem o livro? Desbloqueie tudo". Default: true
-  cta_codigo_titulo?: string
-  cta_codigo_descricao?: string
+  mostrar_cta_codigo?: boolean; // Exibe bloco "Tem o livro? Desbloqueie tudo". Default: true
+  cta_codigo_titulo?: string;
+  cta_codigo_descricao?: string;
 }
 ```
 
@@ -258,42 +261,43 @@ export interface FerramentasContent {
 
 ```typescript
 export interface FormField {
-  field_key: string          // Nome da coluna no Supabase. Ex: "nome", "email", "whatsapp"
-  label: string              // Label visível. Ex: "Seu nome completo"
-  type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'
-  placeholder?: string
-  required?: boolean         // Default: false
-  options?: string[]         // Para type: 'select'. Ex: ["1–5 funcionários", "6–20", "21–50"]
-  mask?: 'phone' | 'cpf'    // Máscara de input
+  field_key: string; // Nome da coluna no Supabase. Ex: "nome", "email", "whatsapp"
+  label: string; // Label visível. Ex: "Seu nome completo"
+  type: "text" | "email" | "tel" | "textarea" | "select" | "checkbox";
+  placeholder?: string;
+  required?: boolean; // Default: false
+  options?: string[]; // Para type: 'select'. Ex: ["1–5 funcionários", "6–20", "21–50"]
+  mask?: "phone" | "cpf"; // Máscara de input
 }
 
 export interface FormContent {
   // Cabeçalho
-  title?: string             // Ex: "Acesse suas ferramentas gratuitas"
-  subtitle?: string          // Ex: "Preencha para receber por e-mail"
-  badge?: string
-  
+  title?: string; // Ex: "Acesse suas ferramentas gratuitas"
+  subtitle?: string; // Ex: "Preencha para receber por e-mail"
+  badge?: string;
+
   // Campos
-  fields: FormField[]
+  fields: FormField[];
 
   // Submit
-  submit_label?: string      // Default: "Acessar ferramentas"
-  
+  submit_label?: string; // Default: "Acessar ferramentas"
+
   // Pós-submit
-  success_title?: string     // Default: "Pronto! Verifique seu e-mail."
-  success_message?: string
-  redirect_url?: string      // Se preenchido, redireciona após submit
-  
+  success_title?: string; // Default: "Pronto! Verifique seu e-mail."
+  success_message?: string;
+  redirect_url?: string; // Se preenchido, redireciona após submit
+
   // Contexto
-  form_id?: string           // ID do formulário na tabela `forms` (opcional)
-  
+  form_id?: string; // ID do formulário na tabela `forms` (opcional)
+
   // Visual
-  bg?: 'white' | 'canvas' | 'blue'  // Default: 'blue'
-  layout?: 'centered' | 'side-by-side'  // Default: 'centered'
+  bg?: "white" | "canvas" | "blue"; // Default: 'blue'
+  layout?: "centered" | "side-by-side"; // Default: 'centered'
 }
 ```
 
 **Exemplo — formulário de captura da página /ferramentas:**
+
 ```json
 {
   "title": "Acesse as ferramentas gratuitamente",
@@ -339,25 +343,26 @@ export interface FormContent {
 
 ```typescript
 export interface FAQItem {
-  question: string
-  answer: string             // Markdown suportado
-  open_by_default?: boolean  // Expande ao carregar. Default: false
+  question: string;
+  answer: string; // Markdown suportado
+  open_by_default?: boolean; // Expande ao carregar. Default: false
 }
 
 export interface FAQContent {
-  title?: string             // Default: "Perguntas frequentes"
-  subtitle?: string
-  badge?: string
-  badge_color?: 'blue' | 'gold' | 'stone'
+  title?: string; // Default: "Perguntas frequentes"
+  subtitle?: string;
+  badge?: string;
+  badge_color?: "blue" | "gold" | "stone";
 
-  items: FAQItem[]           // Sem limite, mas recomendado até 12
+  items: FAQItem[]; // Sem limite, mas recomendado até 12
 
-  bg?: 'white' | 'canvas'    // Default: 'white'
-  layout?: 'single' | 'two-columns'  // Default: 'single'. Two-columns apenas desktop.
+  bg?: "white" | "canvas"; // Default: 'white'
+  layout?: "single" | "two-columns"; // Default: 'single'. Two-columns apenas desktop.
 }
 ```
 
 **Exemplo:**
+
 ```json
 {
   "title": "Dúvidas sobre o Gestor360®",
@@ -386,33 +391,33 @@ export interface FAQContent {
 ```typescript
 export interface CTAContent {
   // Obrigatório
-  title: string
+  title: string;
 
   // Opcionais
-  subtitle?: string
-  body?: string              // Parágrafo de apoio
+  subtitle?: string;
+  body?: string; // Parágrafo de apoio
 
   // Botão principal
-  cta_label?: string         // Ex: "Comprar o livro"
-  cta_url?: string
+  cta_label?: string; // Ex: "Comprar o livro"
+  cta_url?: string;
 
   // Botão secundário
-  cta_secondary_label?: string
-  cta_secondary_url?: string
+  cta_secondary_label?: string;
+  cta_secondary_url?: string;
 
   // Visual
-  variant?: 'blue' | 'gold' | 'dark' | 'canvas'  // Default: 'blue'
+  variant?: "blue" | "gold" | "dark" | "canvas"; // Default: 'blue'
   // blue   = fundo brand-blue, texto branco
   // gold   = fundo brand-gold, texto escuro
   // dark   = fundo ink, texto branco
   // canvas = fundo canvas, texto escuro
 
-  align?: 'left' | 'center'  // Default: 'center'
+  align?: "left" | "center"; // Default: 'center'
 
   // Imagem lateral (layout split)
-  image_url?: string         // Se presente, cria layout text + image
-  image_alt?: string
-  image_side?: 'left' | 'right'  // Default: 'right'
+  image_url?: string; // Se presente, cria layout text + image
+  image_alt?: string;
+  image_side?: "left" | "right"; // Default: 'right'
 }
 ```
 
@@ -425,31 +430,31 @@ export interface CTAContent {
 
 ```typescript
 export interface DepoimentosContent {
-  title?: string             // Default: "O que dizem sobre o Gestor360®"
-  subtitle?: string
-  badge?: string
-  badge_color?: 'blue' | 'gold' | 'stone'
+  title?: string; // Default: "O que dizem sobre o Gestor360®"
+  subtitle?: string;
+  badge?: string;
+  badge_color?: "blue" | "gold" | "stone";
 
   // Fonte dos depoimentos
   // 'supabase' = carrega da tabela `depoimentos` onde aprovado = true
   // 'manual'   = usa os itens definidos aqui (para controle total)
-  source?: 'supabase' | 'manual'  // Default: 'supabase'
+  source?: "supabase" | "manual"; // Default: 'supabase'
 
   // Usado apenas se source = 'manual'
   items?: Array<{
-    nome: string
-    cargo?: string
-    empresa?: string
-    texto: string
-    foto_url?: string
-    nota?: 1 | 2 | 3 | 4 | 5  // Estrelas
-  }>
+    nome: string;
+    cargo?: string;
+    empresa?: string;
+    texto: string;
+    foto_url?: string;
+    nota?: 1 | 2 | 3 | 4 | 5; // Estrelas
+  }>;
 
   // Layout
-  layout?: 'grid' | 'carousel' | 'masonry'  // Default: 'grid'
-  columns?: 2 | 3             // Default: 3 (desktop)
-  bg?: 'white' | 'canvas' | 'ink'  // Default: 'canvas'
-  limit?: number              // Máximo de depoimentos a exibir. Default: 6
+  layout?: "grid" | "carousel" | "masonry"; // Default: 'grid'
+  columns?: 2 | 3; // Default: 3 (desktop)
+  bg?: "white" | "canvas" | "ink"; // Default: 'canvas'
+  limit?: number; // Máximo de depoimentos a exibir. Default: 6
 }
 ```
 
@@ -462,17 +467,17 @@ export interface DepoimentosContent {
 
 ```typescript
 export interface CapitulosContent {
-  title?: string             // Default: "Os 10 capítulos do método"
-  subtitle?: string
-  badge?: string
+  title?: string; // Default: "Os 10 capítulos do método"
+  subtitle?: string;
+  badge?: string;
 
   // Visual
-  bg?: 'white' | 'canvas'   // Default: 'white'
-  layout?: 'grid' | 'numbered-list'  // Default: 'grid'
+  bg?: "white" | "canvas"; // Default: 'white'
+  layout?: "grid" | "numbered-list"; // Default: 'grid'
 
   // Cada card de capítulo pode ter link
-  link_para_ferramenta?: boolean  // CTA "Ver ferramentas" em cada card. Default: true
-  
+  link_para_ferramenta?: boolean; // CTA "Ver ferramentas" em cada card. Default: true
+
   // Os dados dos capítulos são fixos no componente (não vêm do Supabase)
   // pois fazem parte do conteúdo editorial do livro
 }
@@ -491,24 +496,24 @@ export interface CapitulosContent {
 
 ```typescript
 export interface AutorItem {
-  nome: string
-  cargo: string              // Ex: "CEO da DDM Editora · Fundador do Gestor360®"
-  bio: string                // Markdown suportado
-  foto_url: string           // Supabase Storage: /assets/autores/flavio.jpg
-  
-  linkedin_url?: string
-  instagram_url?: string
-  site_url?: string
+  nome: string;
+  cargo: string; // Ex: "CEO da DDM Editora · Fundador do Gestor360®"
+  bio: string; // Markdown suportado
+  foto_url: string; // Supabase Storage: /assets/autores/flavio.jpg
+
+  linkedin_url?: string;
+  instagram_url?: string;
+  site_url?: string;
 }
 
 export interface AutoresContent {
-  title?: string             // Default: "Quem está por trás do método"
-  subtitle?: string
-  
-  autores: AutorItem[]       // Geralmente 2: Flávio e Marcelo
+  title?: string; // Default: "Quem está por trás do método"
+  subtitle?: string;
 
-  bg?: 'white' | 'canvas'    // Default: 'canvas'
-  layout?: 'side-by-side' | 'stacked'  // Default: 'side-by-side'
+  autores: AutorItem[]; // Geralmente 2: Flávio e Marcelo
+
+  bg?: "white" | "canvas"; // Default: 'canvas'
+  layout?: "side-by-side" | "stacked"; // Default: 'side-by-side'
 }
 ```
 
@@ -516,18 +521,18 @@ export interface AutoresContent {
 
 ## Campos obrigatórios por tipo — Resumo rápido
 
-| Tipo | Campos obrigatórios |
-|------|---------------------|
-| `hero` | `title` |
-| `text` | `body` |
-| `cards` | `items[]` (cada item: `title` + `description`) |
-| `ferramentas` | _(nenhum — todos opcionais)_ |
-| `form` | `fields[]` (cada field: `field_key` + `label` + `type`) |
-| `faq` | `items[]` (cada item: `question` + `answer`) |
-| `cta` | `title` |
-| `depoimentos` | _(nenhum se `source = 'supabase'`)_ |
-| `capitulos` | _(nenhum — conteúdo do componente)_ |
-| `autores` | `autores[]` (cada autor: `nome` + `cargo` + `bio` + `foto_url`) |
+| Tipo          | Campos obrigatórios                                             |
+| ------------- | --------------------------------------------------------------- |
+| `hero`        | `title`                                                         |
+| `text`        | `body`                                                          |
+| `cards`       | `items[]` (cada item: `title` + `description`)                  |
+| `ferramentas` | _(nenhum — todos opcionais)_                                    |
+| `form`        | `fields[]` (cada field: `field_key` + `label` + `type`)         |
+| `faq`         | `items[]` (cada item: `question` + `answer`)                    |
+| `cta`         | `title`                                                         |
+| `depoimentos` | _(nenhum se `source = 'supabase'`)_                             |
+| `capitulos`   | _(nenhum — conteúdo do componente)_                             |
+| `autores`     | `autores[]` (cada autor: `nome` + `cargo` + `bio` + `foto_url`) |
 
 ---
 
@@ -536,7 +541,7 @@ export interface AutoresContent {
 ```typescript
 // lib/cms/schemas.ts — para validar o content no painel admin e na API
 
-import { z } from 'zod'
+import { z } from "zod";
 
 export const HeroContentSchema = z.object({
   title: z.string().min(1),
@@ -545,38 +550,38 @@ export const HeroContentSchema = z.object({
   cta_url: z.string().optional(),
   cta_secondary_label: z.string().optional(),
   cta_secondary_url: z.string().optional(),
-  variant: z.enum(['dark', 'canvas', 'blue']).default('dark'),
+  variant: z.enum(["dark", "canvas", "blue"]).default("dark"),
   bg_image: z.string().url().optional(),
   show_360_animation: z.boolean().default(false),
-  align: z.enum(['left', 'center', 'right']).default('center'),
-})
+  align: z.enum(["left", "center", "right"]).default("center"),
+});
 
 export const FormFieldSchema = z.object({
   field_key: z.string().min(1),
   label: z.string().min(1),
-  type: z.enum(['text', 'email', 'tel', 'textarea', 'select', 'checkbox']),
+  type: z.enum(["text", "email", "tel", "textarea", "select", "checkbox"]),
   placeholder: z.string().optional(),
   required: z.boolean().default(false),
   options: z.array(z.string()).optional(),
-  mask: z.enum(['phone', 'cpf']).optional(),
-})
+  mask: z.enum(["phone", "cpf"]).optional(),
+});
 
 export const FormContentSchema = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
   fields: z.array(FormFieldSchema).min(1),
-  submit_label: z.string().default('Enviar'),
-  success_title: z.string().default('Pronto! Verifique seu e-mail.'),
+  submit_label: z.string().default("Enviar"),
+  success_title: z.string().default("Pronto! Verifique seu e-mail."),
   success_message: z.string().optional(),
   redirect_url: z.string().url().optional(),
-  bg: z.enum(['white', 'canvas', 'blue']).default('blue'),
-  layout: z.enum(['centered', 'side-by-side']).default('centered'),
-})
+  bg: z.enum(["white", "canvas", "blue"]).default("blue"),
+  layout: z.enum(["centered", "side-by-side"]).default("centered"),
+});
 
 // ... demais schemas seguem o mesmo padrão
 ```
 
 ---
 
-*Última atualização: Abril 2026 — DDM Editora*
-*Referência: [`docs/PRD.md`](./PRD.md) · [`docs/api.md`](./api.md)*
+_Última atualização: Abril 2026 — DDM Editora_
+_Referência: [`docs/PRD.md`](./PRD.md) · [`docs/api.md`](./api.md)_

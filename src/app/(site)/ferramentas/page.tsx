@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { LeadForm } from '@/components/forms/LeadForm'
 import { Badge } from '@/components/ui/Badge'
+import { Logo } from '@/components/ui/Logo'
 
 export const metadata: Metadata = {
   title: 'Ferramentas Práticas do Gestor360®',
@@ -40,68 +42,116 @@ export default async function FerramentasPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[var(--color-bg-canvas)]">
-      <div className="mx-auto max-w-[var(--container-md)] px-4 sm:px-6 py-12 sm:py-16">
+      <section className="relative overflow-hidden bg-[var(--color-bg-ink)] text-white">
+        <div className="absolute inset-x-0 bottom-0 h-1 bg-[var(--gradient-360)]" aria-hidden="true" />
+        <div className="mx-auto grid max-w-[var(--container-xl)] items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-20">
+          <div>
+            <div className="mb-6 flex flex-wrap items-center gap-3">
+              <Logo variant="full" theme="dark" height={42} />
+              <span className="h-8 w-px bg-white/20" aria-hidden="true" />
+              <span className="text-sm font-semibold uppercase tracking-[0.12em] text-white/70">
+                Biblioteca digital do livro
+              </span>
+            </div>
 
-        {/* Cabeçalho da página */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span
-              className="font-display font-black text-5xl leading-none tracking-[var(--tracking-tight)]"
-              aria-label="360"
-            >
-              <span className="text-[var(--color-stone-accessible)]">3</span>
-              <span className="text-brand-blue">6</span>
-              <span className="text-brand-gold">0</span>
-            </span>
+            {capInfo ? (
+              <>
+                <Badge variant="gold" className="mb-5">
+                  Capítulo {capitulo}
+                </Badge>
+                <h1 className="max-w-3xl font-display text-[clamp(2.5rem,7vw,5.5rem)] font-black leading-[0.95] text-white">
+                  {capInfo.titulo}
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-[var(--leading-relaxed)] text-white/72 sm:text-lg">
+                  {capInfo.ferramentas}
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="max-w-3xl font-display text-[clamp(2.75rem,8vw,6rem)] font-black leading-[0.95] text-white">
+                  31 ferramentas para colocar o Gestor360 em prática
+                </h1>
+                <p className="mt-5 max-w-2xl text-base leading-[var(--leading-relaxed)] text-white/72 sm:text-lg">
+                  Acesse a biblioteca complementar do Manual do Gestor360. Depois do cadastro, enviaremos o link das ferramentas no seu e-mail.
+                </p>
+              </>
+            )}
+
+            <div className="mt-8 grid max-w-xl grid-cols-3 border-y border-white/12 text-center sm:text-left">
+              <div className="py-4 pr-3">
+                <p className="font-display text-2xl font-black text-white">31</p>
+                <p className="text-xs font-medium text-white/58">ferramentas</p>
+              </div>
+              <div className="border-x border-white/12 px-3 py-4">
+                <p className="font-display text-2xl font-black text-white">10</p>
+                <p className="text-xs font-medium text-white/58">capítulos</p>
+              </div>
+              <div className="py-4 pl-3">
+                <p className="font-display text-2xl font-black text-white">1</p>
+                <p className="text-xs font-medium text-white/58">método</p>
+              </div>
+            </div>
           </div>
 
-          {capInfo ? (
-            <>
-              <Badge variant="blue" className="mb-4">
-                Capítulo {capitulo}
-              </Badge>
-              <h1 className="font-display font-black text-[var(--text-hero)] text-[var(--color-text-title)] leading-[var(--leading-tight)] tracking-[var(--tracking-tight)] mb-3">
-                {capInfo.titulo}
-              </h1>
-              <p className="text-[var(--color-text-muted)] text-sm">
-                {capInfo.ferramentas}
-              </p>
-            </>
-          ) : (
-            <>
-              <h1 className="font-display font-black text-[var(--text-hero)] text-[var(--color-text-title)] leading-[var(--leading-tight)] tracking-[var(--tracking-tight)] mb-3">
-                31 Ferramentas Práticas
-              </h1>
-              <p className="text-[var(--color-text-body)] max-w-md mx-auto">
-                Para os 10 capítulos do método. Cadastre-se e acesse gratuitamente as ferramentas do capítulo que está lendo.
-              </p>
-            </>
-          )}
+          <div className="mx-auto w-full max-w-[280px] lg:max-w-[340px]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-lg)] bg-white/5 shadow-[var(--shadow-lg)] ring-1 ring-white/12">
+              <Image
+                src="/Capa_livro.png"
+                alt="Manual do Gestor360"
+                fill
+                priority
+                sizes="(min-width: 1024px) 340px, 280px"
+                className="object-cover"
+              />
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Card do formulário */}
-        <div className="bg-white rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-6 sm:p-8 max-w-md mx-auto">
-          <h2 className="font-display font-bold text-lg text-[var(--color-text-title)] mb-2">
-            {capInfo
-              ? `Acesse as ferramentas do Capítulo ${capitulo}`
-              : 'Cadastre-se e acesse gratuitamente'}
-          </h2>
-          <p className="text-sm text-[var(--color-text-muted)] mb-6">
-            É grátis. Você receberá os PDFs por e-mail em segundos.
+      <div className="mx-auto grid max-w-[var(--container-xl)] gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
+        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-sm)] sm:p-8">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-brand-blue">
+            Como funciona
           </p>
+          <h2 className="font-display text-[var(--text-heading)] font-black leading-[var(--leading-tight)]">
+            O material complementar fica organizado em um único acesso.
+          </h2>
+          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+            {[
+              ['01', 'Preencha o cadastro', 'Seu e-mail identifica o acesso e ajuda a manter a entrega organizada.'],
+              ['02', 'Receba o link', 'A confirmação chega pelo e-mail oficial contato@ogestor360.com.'],
+              ['03', 'Use as ferramentas', 'A biblioteca reunirá o kit completo e os arquivos organizados por capítulo.'],
+            ].map(([number, title, text]) => (
+              <div key={number} className="border-t border-[var(--color-border)] pt-4">
+                <p className="font-display text-2xl font-black text-brand-gold">{number}</p>
+                <h3 className="mt-3 text-base font-bold text-[var(--color-text-title)]">{title}</h3>
+                <p className="mt-2 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-body)]">{text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-md)] sm:p-8">
+          <div className="mb-6">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-brand-gold">
+              Acesso gratuito
+            </p>
+            <h2 className="font-display text-2xl font-black leading-[var(--leading-tight)] text-[var(--color-text-title)]">
+              {capInfo
+                ? `Ferramentas do Capítulo ${capitulo}`
+                : 'Receba as ferramentas do Gestor360'}
+            </h2>
+            <p className="mt-3 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-muted)]">
+              Use o mesmo e-mail que você quer receber o link de acesso.
+            </p>
+          </div>
 
           <LeadForm
             capituloOrigem={capitulo || undefined}
             consentSource={consentSource}
             utmParams={utmParams}
           />
-        </div>
-
-        {/* Rodapé informativo */}
-        <p className="text-center text-xs text-[var(--color-text-muted)] mt-8">
-          Você receberá acesso às ferramentas gratuitas do capítulo.{' '}
-          Tem o livro? Insira o código impresso para desbloquear todas as 31 ferramentas.
-        </p>
+        </section>
       </div>
     </div>
   )

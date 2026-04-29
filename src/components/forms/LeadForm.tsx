@@ -67,17 +67,27 @@ export function LeadForm({ capituloOrigem, consentSource, utmParams }: LeadFormP
   if (success) {
     return (
       <div
-        className="rounded-[var(--radius-lg)] bg-success/10 border border-success/20 p-6 text-center"
+        className="rounded-[var(--radius-lg)] border border-success/20 bg-success/10 p-6"
         role="status"
         aria-live="polite"
       >
-        <p className="text-2xl mb-2">✓</p>
-        <p className="font-semibold text-[var(--color-text-title)] mb-1">
-          Cadastro realizado!
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-[var(--radius-full)] bg-success text-white">
+          <span className="text-xl font-bold" aria-hidden="true">✓</span>
+        </div>
+        <p className="font-display text-2xl font-black leading-[var(--leading-tight)] text-[var(--color-text-title)]">
+          Cadastro confirmado.
         </p>
-        <p className="text-sm text-[var(--color-text-body)]">
-          Verifique seu e-mail em até 2 minutos com o link das ferramentas.
+        <p className="mt-3 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-body)]">
+          {success.mensagem || 'Enviamos o link das ferramentas para o seu e-mail.'}
         </p>
+        <div className="mt-5 rounded-[var(--radius-md)] border border-success/20 bg-white/70 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-success">
+            Próximo passo
+          </p>
+          <p className="mt-2 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-body)]">
+            Confira a caixa de entrada e o spam. O e-mail chega pelo remetente oficial contato@ogestor360.com.
+          </p>
+        </div>
       </div>
     )
   }
@@ -122,12 +132,12 @@ export function LeadForm({ capituloOrigem, consentSource, utmParams }: LeadFormP
       )}
 
       <p className="text-xs text-[var(--color-text-muted)] leading-[var(--leading-relaxed)]">
-        Ao cadastrar, você concorda com o uso dos seus dados para envio das ferramentas e comunicações do Gestor360®.
-        Você pode cancelar a qualquer momento.
+        Ao cadastrar, você autoriza o envio do link das ferramentas e comunicações do Gestor360®.
+        Seus dados não serão vendidos ou compartilhados com terceiros.
       </p>
 
       <Button type="submit" loading={isSubmitting} size="lg" className="w-full">
-        {isSubmitting ? 'Enviando...' : 'Quero acesso gratuito →'}
+        {isSubmitting ? 'Enviando...' : 'Receber acesso gratuito'}
       </Button>
     </form>
   )

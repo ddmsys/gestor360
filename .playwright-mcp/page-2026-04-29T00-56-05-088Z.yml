@@ -1,0 +1,109 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Gestor360® — Página inicial" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: "360"
+        - generic [ref=e6]: Gestor
+      - navigation "Navegação principal" [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link "O Método" [ref=e10] [cursor=pointer]:
+              - /url: /metodo
+          - listitem [ref=e11]:
+            - link "Ferramentas" [ref=e12] [cursor=pointer]:
+              - /url: /ferramentas
+          - listitem [ref=e13]:
+            - link "O Livro" [ref=e14] [cursor=pointer]:
+              - /url: /livro
+          - listitem [ref=e15]:
+            - link "Sobre" [ref=e16] [cursor=pointer]:
+              - /url: /sobre
+      - link "Acessar ferramentas" [ref=e17] [cursor=pointer]:
+        - /url: /ferramentas
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - generic "360" [ref=e25]
+            - generic [ref=e27]: Biblioteca digital do livro
+          - heading "31 ferramentas para colocar o Gestor360 em pratica" [level=1] [ref=e28]
+          - paragraph [ref=e29]: Acesse a biblioteca complementar do Manual do Gestor360. Depois do cadastro, enviaremos o link das ferramentas no seu e-mail.
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - paragraph [ref=e32]: "31"
+              - paragraph [ref=e33]: ferramentas
+            - generic [ref=e34]:
+              - paragraph [ref=e35]: "10"
+              - paragraph [ref=e36]: capítulos
+            - generic [ref=e37]:
+              - paragraph [ref=e38]: "1"
+              - paragraph [ref=e39]: método
+        - img "Manual do Gestor360" [ref=e42]
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: Como funciona
+          - heading "O material complementar fica organizado em um unico acesso." [level=2] [ref=e46]
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - paragraph [ref=e49]: "01"
+              - heading "Preencha o cadastro" [level=3] [ref=e50]
+              - paragraph [ref=e51]: Seu e-mail identifica o acesso e ajuda a manter a entrega organizada.
+            - generic [ref=e52]:
+              - paragraph [ref=e53]: "02"
+              - heading "Receba o link" [level=3] [ref=e54]
+              - paragraph [ref=e55]: O Resend envia a confirmação pelo contato oficial do Gestor360.
+            - generic [ref=e56]:
+              - paragraph [ref=e57]: "03"
+              - heading "Use as ferramentas" [level=3] [ref=e58]
+              - paragraph [ref=e59]: A biblioteca sera liberada com kit completo e arquivos por capítulo.
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - paragraph [ref=e62]: Acesso gratuito
+            - heading "Receba as ferramentas do Gestor360" [level=2] [ref=e63]
+            - paragraph [ref=e64]: Use o mesmo e-mail que você quer receber o link de acesso.
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - generic [ref=e67]: Seu nome*
+              - textbox "Seu nome" [ref=e68]:
+                - /placeholder: Como podemos te chamar?
+            - generic [ref=e69]:
+              - generic [ref=e70]: Seu e-mail*
+              - textbox "Seu e-mail" [ref=e71]:
+                - /placeholder: seu@email.com
+            - generic [ref=e72]:
+              - generic [ref=e73]: WhatsApp
+              - textbox "WhatsApp" [ref=e74]:
+                - /placeholder: (11) 9 0000-0000
+              - paragraph [ref=e75]: Opcional — para receber as ferramentas também no WhatsApp
+            - paragraph [ref=e76]: Ao cadastrar, você autoriza o envio do link das ferramentas e comunicações do Gestor360®. Seus dados não serão vendidos ou compartilhados com terceiros.
+            - button "Receber acesso gratuito" [ref=e77] [cursor=pointer]
+  - contentinfo [ref=e78]:
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - paragraph [ref=e81]: 360 Gestor
+        - paragraph [ref=e82]: O método que une razão e alma para transformar quem lidera.
+      - generic [ref=e83]:
+        - paragraph [ref=e84]: Navegação
+        - list [ref=e85]:
+          - listitem [ref=e86]:
+            - link "O Método" [ref=e87] [cursor=pointer]:
+              - /url: /metodo
+          - listitem [ref=e88]:
+            - link "Ferramentas" [ref=e89] [cursor=pointer]:
+              - /url: /ferramentas
+          - listitem [ref=e90]:
+            - link "O Livro" [ref=e91] [cursor=pointer]:
+              - /url: /livro
+          - listitem [ref=e92]:
+            - link "Sobre" [ref=e93] [cursor=pointer]:
+              - /url: /sobre
+      - generic [ref=e94]:
+        - paragraph [ref=e95]: DDM Editora
+        - paragraph [ref=e96]: Rua dos Empreendedores, Brasil
+        - link "contato@ogestor360.com" [ref=e97] [cursor=pointer]:
+          - /url: mailto:contato@ogestor360.com
+    - generic [ref=e99]:
+      - paragraph [ref=e100]: © 2026 Gestor360® — DDM Editora. Todos os direitos reservados.
+      - paragraph [ref=e101]: Livro publicado em abril de 2026

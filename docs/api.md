@@ -45,6 +45,7 @@ Content-Type: application/json
 ### Responses
 
 **201 Created — sucesso**
+
 ```json
 {
   "success": true,
@@ -54,6 +55,7 @@ Content-Type: application/json
 ```
 
 **409 Conflict — e-mail já cadastrado**
+
 ```json
 {
   "success": false,
@@ -63,6 +65,7 @@ Content-Type: application/json
 ```
 
 **422 Unprocessable — dados inválidos**
+
 ```json
 {
   "success": false,
@@ -75,6 +78,7 @@ Content-Type: application/json
 ```
 
 **429 Too Many Requests — rate limit**
+
 ```json
 {
   "success": false,
@@ -114,14 +118,15 @@ GET /api/ferramentas?capitulo=3&acesso=gratuito
 
 **Query params:**
 
-| Param | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `capitulo` | number 1–10 | não | Filtrar por capítulo |
-| `acesso` | `gratuito` \| `codigo_livro` | não | Filtrar por tipo de acesso |
+| Param      | Tipo                         | Obrigatório | Descrição                  |
+| ---------- | ---------------------------- | ----------- | -------------------------- |
+| `capitulo` | number 1–10                  | não         | Filtrar por capítulo       |
+| `acesso`   | `gratuito` \| `codigo_livro` | não         | Filtrar por tipo de acesso |
 
 ### Response
 
 **200 OK**
+
 ```json
 {
   "ferramentas": [
@@ -158,6 +163,7 @@ Authorization: Bearer <lead_token>    # token gerado após cadastro
 ### Response
 
 **200 OK**
+
 ```json
 {
   "url": "https://storage.supabase.co/signed/...",
@@ -167,6 +173,7 @@ Authorization: Bearer <lead_token>    # token gerado após cadastro
 ```
 
 **403 Forbidden — ferramenta requer código do livro**
+
 ```json
 {
   "success": false,
@@ -176,6 +183,7 @@ Authorization: Bearer <lead_token>    # token gerado após cadastro
 ```
 
 **404 Not Found**
+
 ```json
 {
   "success": false,
@@ -219,6 +227,7 @@ Authorization: Bearer <lead_token>
 ### Response
 
 **200 OK — código válido**
+
 ```json
 {
   "success": true,
@@ -228,6 +237,7 @@ Authorization: Bearer <lead_token>
 ```
 
 **400 Bad Request — código inválido**
+
 ```json
 {
   "success": false,
@@ -246,7 +256,7 @@ Authorization: Bearer <lead_token>
 4. Retornar sucesso
 ```
 
-> **Segurança:** o código do livro nunca é comparado no frontend. 
+> **Segurança:** o código do livro nunca é comparado no frontend.
 > Todo o hash e validação é server-side.
 
 ---
@@ -268,6 +278,7 @@ GET /api/pages/landing/lancamento-bh
 ### Response
 
 **200 OK**
+
 ```json
 {
   "page": {
@@ -303,6 +314,7 @@ GET /api/pages/landing/lancamento-bh
 ```
 
 **404 Not Found**
+
 ```json
 {
   "success": false,
@@ -319,42 +331,42 @@ GET /api/pages/landing/lancamento-bh
 
 ```typescript
 // middleware.ts
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl
+  const { pathname } = req.nextUrl;
 
   // Rate limiting para /api/leads
-  if (pathname === '/api/leads' && req.method === 'POST') {
+  if (pathname === "/api/leads" && req.method === "POST") {
     // implementar com Vercel KV ou headers de IP
   }
 
   // Proteção do painel admin
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith("/admin")) {
     // verificar sessão Supabase
     // redirecionar para /login se não autenticado
   }
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/leads', '/api/ferramentas/:path*/download'],
-}
+  matcher: ["/admin/:path*", "/api/leads", "/api/ferramentas/:path*/download"],
+};
 ```
 
 ---
 
 ## Resumo dos endpoints
 
-| Método | Rota | Acesso | Descrição |
-|--------|------|--------|-----------|
-| `POST` | `/api/leads` | Público | Cadastrar novo lead |
-| `GET` | `/api/ferramentas` | Público (gratuitas) / Auth (todas) | Listar ferramentas |
-| `GET` | `/api/ferramentas/[id]/download` | Lead autenticado | Baixar PDF via signed URL |
-| `POST` | `/api/leads/validar-codigo` | Lead autenticado | Validar código do livro |
-| `GET` | `/api/pages/[slug]` | Público (published) / Admin (todas) | Buscar página com seções |
+| Método | Rota                             | Acesso                              | Descrição                 |
+| ------ | -------------------------------- | ----------------------------------- | ------------------------- |
+| `POST` | `/api/leads`                     | Público                             | Cadastrar novo lead       |
+| `GET`  | `/api/ferramentas`               | Público (gratuitas) / Auth (todas)  | Listar ferramentas        |
+| `GET`  | `/api/ferramentas/[id]/download` | Lead autenticado                    | Baixar PDF via signed URL |
+| `POST` | `/api/leads/validar-codigo`      | Lead autenticado                    | Validar código do livro   |
+| `GET`  | `/api/pages/[slug]`              | Público (published) / Admin (todas) | Buscar página com seções  |
 
 ---
 
-*Última atualização: Abril 2026 — DDM Editora*
-*Referência: [`docs/PRD.md`](./PRD.md) · [`docs/cms-fields.md`](./cms-fields.md)*
+_Última atualização: Abril 2026 — DDM Editora_
+_Referência: [`docs/PRD.md`](./PRD.md) · [`docs/cms-fields.md`](./cms-fields.md)_

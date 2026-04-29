@@ -1,18 +1,58 @@
-import type { PageSection } from '@/types/cms'
+import type {
+  PageSection,
+  HeroContent,
+  TextContent,
+  CTAContent,
+  CardsContent,
+  FAQContent,
+  DepoimentosContent,
+  CapitulosContent,
+  AutoresContent,
+  FerramentasContent,
+  FormContent,
+} from "@/types/cms";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { TextSection } from "@/components/sections/TextSection";
+import { CTASection } from "@/components/sections/CTASection";
+import { CardsSection } from "@/components/sections/CardsSection";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { DepoimentosSection } from "@/components/sections/DepoimentosSection";
+import { CapitulosSection } from "@/components/sections/CapitulosSection";
+import { AutoresSection } from "@/components/sections/AutoresSection";
+import { FerramentasSection } from "@/components/sections/FerramentasSection";
+import { FormSection } from "@/components/sections/FormSection";
 
 interface Props {
-  section: PageSection
+  section: PageSection;
 }
 
 export function SectionRenderer({ section }: Props) {
   switch (section.type) {
-    case 'hero':
-      return <div data-section="hero" data-id={section.id} />
-    case 'text':
-      return <div data-section="text" data-id={section.id} />
-    case 'cta':
-      return <div data-section="cta" data-id={section.id} />
+    case "hero":
+      return <HeroSection content={section.content as HeroContent} />;
+    case "text":
+      return <TextSection content={section.content as TextContent} />;
+    case "cta":
+      return <CTASection content={section.content as CTAContent} />;
+    case "cards":
+      return <CardsSection content={section.content as CardsContent} />;
+    case "faq":
+      return <FAQSection content={section.content as FAQContent} />;
+    case "depoimentos":
+      return (
+        <DepoimentosSection content={section.content as DepoimentosContent} />
+      );
+    case "capitulos":
+      return <CapitulosSection content={section.content as CapitulosContent} />;
+    case "autores":
+      return <AutoresSection content={section.content as AutoresContent} />;
+    case "ferramentas":
+      return (
+        <FerramentasSection content={section.content as FerramentasContent} />
+      );
+    case "form":
+      return <FormSection content={section.content as FormContent} />;
     default:
-      return null
+      return null;
   }
 }
