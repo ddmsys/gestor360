@@ -91,6 +91,15 @@ export function LoginForm() {
       <Button type="submit" loading={isSubmitting} size="lg" className="w-full">
         {isSubmitting ? 'Entrando...' : 'Entrar no admin'}
       </Button>
+
+      <p className="text-center text-sm text-[var(--color-text-muted)]">
+        <a
+          href="/login/redefinir-senha"
+          className="text-brand-blue underline-offset-2 hover:underline"
+        >
+          Esqueci minha senha
+        </a>
+      </p>
     </form>
   )
 }
