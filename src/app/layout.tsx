@@ -28,12 +28,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${dmSans.variable} h-full antialiased`}>
+    <html
+      lang="pt-BR"
+      className={`${dmSans.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://use.typekit.net/pwr2rya.css" />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   )
 }

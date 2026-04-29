@@ -3,7 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+import { isAllowedAdmin } from '@/lib/admin/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+
+const FERRAMENTAS_BUCKET = 'ferramentas-pdf'
 
 const ferramentaSchema = z.object({
   numero: z.coerce.number().int().min(1, 'Informe o número.').max(999),
@@ -21,6 +25,99 @@ const ferramentaSchema = z.object({
 
 function normalizeOptional(value: string | undefined) {
   return value && value.length > 0 ? value : null
+}
+
+function sanitizeFileName(fileName: string) {
+  return fileName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function buildStoragePath(payload: {
+  tipo: string
+  capitulo: number
+  arquivo_path: string | null
+}, fileName: string) {
+  if (payload.arquivo_path) {
+    return payload.arquivo_path
+  }
+
+  const safeName = sanitizeFileName(fileName)
+
+  if (payload.tipo === 'kit_completo') {
+    return `kit-completo/${safeName}`
+  }
+
+  return `capitulo-${String(payload.capitulo).padStart(2, '0')}/${safeName}`
+}
+
+function getUploadedFile(formData: FormData) {
+  const file = formData.get('arquivo_file')
+  if (!(file instanceof File) || file.size === 0) return null
+  return file
+}
+
+async function requireAdminUser() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!isAllowedAdmin(user)) {
+    redirect('/login?error=unauthorized')
+  }
+}
+
+async function ensureFerramentasBucket() {
+  const supabaseAdmin = createAdminClient()
+  const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets()
+
+  if (listError) {
+    throw new Error(listError.message)
+  }
+
+  if (buckets.some((bucket) => bucket.name === FERRAMENTAS_BUCKET)) {
+    return supabaseAdmin
+  }
+
+  const { error: createError } = await supabaseAdmin.storage.createBucket(FERRAMENTAS_BUCKET, {
+    public: false,
+    fileSizeLimit: 25 * 1024 * 1024,
+    allowedMimeTypes: ['application/pdf', 'application/zip', 'application/x-zip-compressed'],
+  })
+
+  if (createError) {
+    throw new Error(createError.message)
+  }
+
+  return supabaseAdmin
+}
+
+async function uploadArquivoIfPresent(formData: FormData, payload: ReturnType<typeof parseFerramentaForm>) {
+  const file = getUploadedFile(formData)
+  if (!file) return payload
+
+  const storagePath = buildStoragePath(payload, file.name)
+  const supabaseAdmin = await ensureFerramentasBucket()
+  const { error } = await supabaseAdmin.storage
+    .from(FERRAMENTAS_BUCKET)
+    .upload(storagePath, file, {
+      cacheControl: '3600',
+      contentType: file.type || undefined,
+      upsert: true,
+    })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return {
+    ...payload,
+    arquivo_path: storagePath,
+  }
 }
 
 function parseFerramentaForm(formData: FormData) {
@@ -60,7 +157,15 @@ function parseFerramentaForm(formData: FormData) {
 }
 
 export async function createFerramenta(formData: FormData) {
-  const payload = parseFerramentaForm(formData)
+  await requireAdminUser()
+  const parsedPayload = parseFerramentaForm(formData)
+  let payload: typeof parsedPayload
+  try {
+    payload = await uploadArquivoIfPresent(formData, parsedPayload)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro ao enviar arquivo.'
+    redirect(`/admin/ferramentas?error=${encodeURIComponent(message)}`)
+  }
   const supabase = await createClient()
 
   const { error } = await supabase.from('ferramentas').insert(payload)
@@ -74,7 +179,15 @@ export async function createFerramenta(formData: FormData) {
 }
 
 export async function updateFerramenta(id: string, formData: FormData) {
-  const payload = parseFerramentaForm(formData)
+  await requireAdminUser()
+  const parsedPayload = parseFerramentaForm(formData)
+  let payload: typeof parsedPayload
+  try {
+    payload = await uploadArquivoIfPresent(formData, parsedPayload)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro ao enviar arquivo.'
+    redirect(`/admin/ferramentas/${id}?error=${encodeURIComponent(message)}`)
+  }
   const supabase = await createClient()
 
   const { error } = await supabase
@@ -92,6 +205,7 @@ export async function updateFerramenta(id: string, formData: FormData) {
 }
 
 export async function deleteFerramenta(id: string) {
+  await requireAdminUser()
   const supabase = await createClient()
   const { error } = await supabase.from('ferramentas').delete().eq('id', id)
 

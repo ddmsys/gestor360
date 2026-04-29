@@ -74,12 +74,24 @@ export default async function EditarFerramentaPage({
           </div>
 
           <form action={deleteAction}>
-            <button
-              type="submit"
-              className="rounded-[var(--radius-md)] border border-error/20 px-4 py-2 text-sm font-semibold text-error transition-colors hover:bg-error/10"
-            >
-              Excluir
-            </button>
+            <div className="flex items-center gap-3">
+              {ferramenta.arquivo_path && (
+                <a
+                  href={`/api/ferramentas/${ferramenta.id}/download`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-2 text-sm font-semibold text-brand-blue transition-colors hover:bg-[var(--color-brand-blue-subtle)]"
+                >
+                  Baixar
+                </a>
+              )}
+              <button
+                type="submit"
+                className="rounded-[var(--radius-md)] border border-error/20 px-4 py-2 text-sm font-semibold text-error transition-colors hover:bg-error/10"
+              >
+                Excluir
+              </button>
+            </div>
           </form>
         </div>
 

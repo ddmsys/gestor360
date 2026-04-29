@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '30mb',
+    },
+  },
   async redirects() {
     return [
       // QR Codes do livro impresso — redireciona para o path correto preservando query string

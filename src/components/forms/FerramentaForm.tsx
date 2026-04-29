@@ -108,11 +108,19 @@ export function FerramentaForm({
       </div>
 
       <Input
-        label="Arquivo no Supabase Storage"
+        label="Caminho atual no Supabase Storage"
         name="arquivo_path"
         defaultValue={ferramenta?.arquivo_path ?? ''}
-        placeholder="capitulo-01/01-gst.pdf"
-        hint="Pode ficar vazio enquanto os PDFs finais não estiverem prontos."
+        placeholder="capitulo-01/ferramenta_01_GST_oGestor360.pdf"
+        hint="Se enviar um arquivo abaixo e deixar este campo vazio, o sistema cria o caminho automaticamente."
+      />
+
+      <Input
+        label="Enviar PDF ou ZIP"
+        name="arquivo_file"
+        type="file"
+        accept="application/pdf,application/zip,.pdf,.zip"
+        hint="O arquivo vai direto para o bucket privado ferramentas-pdf. Limite atual: 25 MB por arquivo."
       />
 
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_160px]">

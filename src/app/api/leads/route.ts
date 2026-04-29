@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const leadSchema = z.object({
   nome: z.string().min(2).max(120).trim(),
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   const { nome, email, whatsapp, capitulo_origem, consent_source, metadata } = parsed.data
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { error: dbError } = await supabase.from('leads').insert({
     nome,
@@ -56,7 +56,12 @@ export async function POST(request: Request) {
         { status: 200 }
       )
     }
-    console.error('[api/leads] DB error:', dbError)
+    console.error('[api/leads] DB error:', {
+      code: dbError.code,
+      message: dbError.message,
+      details: dbError.details,
+      hint: dbError.hint,
+    })
     return NextResponse.json(
       { error: 'Erro ao salvar. Tente novamente.' },
       { status: 500 }

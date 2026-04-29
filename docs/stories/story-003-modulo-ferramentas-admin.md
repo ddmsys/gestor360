@@ -17,6 +17,7 @@ Criar o modulo administrativo de ferramentas para cadastrar, editar, listar e pr
 - [x] `/admin/ferramentas` lista ferramentas por capitulo, ordem e numero.
 - [x] `/admin/ferramentas/nova` cria ferramenta como rascunho ou publicada.
 - [x] `/admin/ferramentas/[id]` edita metadados, arquivo, imagem, cor e status.
+- [x] O admin permite enviar PDF/ZIP direto para o Supabase Storage.
 - [x] O modulo suporta kit completo e ferramenta individual.
 - [x] Existe SQL para preparar/atualizar a tabela `ferramentas`.
 - [x] `npm run build` passa.
@@ -30,6 +31,7 @@ Criar o modulo administrativo de ferramentas para cadastrar, editar, listar e pr
 - [x] Criar tela de edicao.
 - [x] Criar SQL de suporte.
 - [x] Criar seed SQL com as 31 ferramentas em rascunho.
+- [x] Adicionar upload direto de PDF/ZIP pelo formulario.
 - [x] Validar build.
 
 ## Validation

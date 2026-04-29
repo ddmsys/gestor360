@@ -163,12 +163,24 @@ export default async function FerramentasPage({ searchParams }: PageProps) {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/admin/ferramentas/${ferramenta.id}`}
-                      className="text-xs font-semibold text-brand-blue hover:underline"
-                    >
-                      Editar
-                    </Link>
+                    <div className="flex items-center justify-end gap-3">
+                      {ferramenta.arquivo_path && (
+                        <a
+                          href={`/api/ferramentas/${ferramenta.id}/download`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-semibold text-[var(--color-text-muted)] hover:text-brand-blue"
+                        >
+                          Baixar
+                        </a>
+                      )}
+                      <Link
+                        href={`/admin/ferramentas/${ferramenta.id}`}
+                        className="text-xs font-semibold text-brand-blue hover:underline"
+                      >
+                        Editar
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
