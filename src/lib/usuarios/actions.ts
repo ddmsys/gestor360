@@ -12,6 +12,13 @@ const usuarioSchema = z.object({
   nome: z.string().trim().max(120).optional(),
 })
 
+function getSiteUrl() {
+  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  if (vercelUrl) return vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`
+  return 'https://ogestor360.com'
+}
+
 async function requireSuperAdmin() {
   await requireAdmin()
   const ok = await isSuperAdmin()
@@ -40,6 +47,9 @@ export async function addAdminUser(formData: FormData) {
   const { email, nome } = parsed.data
   const criado_por = await getCurrentUserEmail()
   const admin = createAdminClient()
+  const siteUrl = getSiteUrl()
+  const inviteRedirectTo = `${siteUrl}/auth/callback?type=invite`
+  const recoveryRedirectTo = `${siteUrl}/auth/callback?type=recovery`
 
   const { error } = await admin.from('admin_users').insert({ email, nome: nome || null, criado_por })
 
@@ -48,8 +58,29 @@ export async function addAdminUser(formData: FormData) {
     redirect(`/admin/usuarios?error=${encodeURIComponent(msg)}`)
   }
 
+  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: inviteRedirectTo,
+  })
+
+  if (inviteError) {
+    const alreadyExists =
+      inviteError.message.toLowerCase().includes('already') ||
+      inviteError.message.toLowerCase().includes('registered')
+
+    if (alreadyExists) {
+      const { error: resetError } = await admin.auth.resetPasswordForEmail(email, {
+        redirectTo: recoveryRedirectTo,
+      })
+      if (resetError) {
+        redirect(`/admin/usuarios?error=${encodeURIComponent(resetError.message)}`)
+      }
+    } else {
+      redirect(`/admin/usuarios?error=${encodeURIComponent(inviteError.message)}`)
+    }
+  }
+
   revalidatePath('/admin/usuarios')
-  redirect('/admin/usuarios?success=usuario-adicionado')
+  redirect('/admin/usuarios?success=convite-enviado')
 }
 
 export async function toggleAdminUserAtivo(id: string, ativo: boolean) {

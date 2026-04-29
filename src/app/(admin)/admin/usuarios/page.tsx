@@ -37,6 +37,7 @@ export default async function AdminUsuariosPage({
       {params.success && (
         <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-[var(--radius-md)]">
           {params.success === 'usuario-adicionado' && 'Usuário adicionado. Ele já pode fazer login no admin.'}
+          {params.success === 'convite-enviado' && 'Usuário autorizado e link enviado por e-mail.'}
           {params.success === 'usuario-removido' && 'Usuário removido com sucesso.'}
         </div>
       )}
@@ -190,8 +191,8 @@ export default async function AdminUsuariosPage({
           </div>
         </form>
         <p className="mt-3 text-xs text-[var(--color-text-muted)]">
-          O usuário precisa criar uma conta no Supabase Auth com este e-mail para conseguir fazer login.
-          Envie o link <strong>ogestor360.com/login</strong> para ele.
+          Ao adicionar, o sistema autoriza o e-mail e envia um convite pelo Supabase Auth.
+          Se a conta já existir, será enviado um link para redefinir a senha.
         </p>
       </div>
     </div>

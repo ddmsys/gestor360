@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
@@ -108,12 +109,12 @@ export default function NovaSenhaPage() {
               <div className="mt-6">
                 <p className="text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-muted)]">
                   Verificando o link de recuperação… Se este formulário não carregar, o link pode ter expirado.{' '}
-                  <a
+                  <Link
                     href="/login/redefinir-senha"
                     className="text-brand-blue underline-offset-2 hover:underline"
                   >
                     Solicitar novo link.
-                  </a>
+                  </Link>
                 </p>
               </div>
             ) : (

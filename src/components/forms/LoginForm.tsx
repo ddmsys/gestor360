@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
@@ -199,12 +200,12 @@ export function LoginForm() {
 
         {mode === 'login' && (
           <p className="text-center text-sm text-[var(--color-text-muted)]">
-            <a
+            <Link
               href="/login/redefinir-senha"
               className="text-brand-blue underline-offset-2 hover:underline"
             >
               Esqueci minha senha
-            </a>
+            </Link>
           </p>
         )}
 

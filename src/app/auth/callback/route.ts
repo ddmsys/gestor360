@@ -4,6 +4,13 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
 
+  const errorCode = searchParams.get('error_code')
+  if (errorCode) {
+    return NextResponse.redirect(
+      `${origin}/login?error=${errorCode === 'otp_expired' ? 'link-expirado' : 'link-invalido'}`,
+    )
+  }
+
   // Fluxo de e-mail: confirmação de cadastro e recuperação de senha
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
@@ -20,7 +27,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (!error) {
-      if (type === 'recovery') {
+      if (type === 'recovery' || type === 'invite') {
         return NextResponse.redirect(`${origin}/login/nova-senha`)
       }
       return NextResponse.redirect(`${origin}/admin`)
@@ -30,6 +37,9 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      if (type === 'recovery' || type === 'invite') {
+        return NextResponse.redirect(`${origin}/login/nova-senha`)
+      }
       return NextResponse.redirect(`${origin}/admin`)
     }
   }
