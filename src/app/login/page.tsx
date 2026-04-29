@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { LoginForm } from '@/components/forms/LoginForm'
-import { isAllowedAdmin } from '@/lib/admin/auth'
+import { isAdminUser } from '@/lib/admin/auth'
 import { createClient } from '@/lib/supabase/server'
 import { Logo } from '@/components/ui/Logo'
 
@@ -17,7 +17,7 @@ export default async function LoginPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (isAllowedAdmin(user)) {
+  if (user?.email && await isAdminUser(user.email)) {
     redirect('/admin')
   }
 
@@ -41,7 +41,7 @@ export default async function LoginPage() {
                 Acesso restrito
               </p>
               <h1 className="mt-3 max-w-md font-display text-[var(--text-heading)] font-black leading-[var(--leading-tight)] text-white">
-                Entre com o e-mail autorizado da equipe.
+                Entre ou crie sua conta com o e-mail autorizado.
               </h1>
             </div>
           </div>
@@ -54,7 +54,7 @@ export default async function LoginPage() {
               Acessar painel
             </h2>
             <p className="mb-7 mt-3 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-muted)]">
-              Use o cadastro criado no Supabase Auth.
+              Entre com sua conta ou crie uma nova. O acesso ao admin requer autorização prévia.
             </p>
 
             <Suspense>
