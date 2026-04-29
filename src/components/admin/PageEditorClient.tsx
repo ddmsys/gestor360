@@ -152,6 +152,11 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
     markDirty()
   }, [markDirty])
 
+  const reorderSections = useCallback((reordered: PageSection[]) => {
+    setSections(reordered)
+    markDirty()
+  }, [markDirty])
+
   const toggleVisible = useCallback((id: string) => {
     setSections((prev) =>
       prev.map((s) => (s.id === id ? { ...s, visible: !s.visible } : s)),
@@ -344,6 +349,7 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
           selectedId={selectedId}
           onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
           onMove={moveSection}
+          onReorder={reorderSections}
           onToggleVisible={toggleVisible}
           onDelete={deleteSection}
           onDuplicate={duplicateSection}

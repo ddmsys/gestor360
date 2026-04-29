@@ -28,9 +28,9 @@ interface Props {
 }
 
 export function SectionRenderer({ section }: Props) {
-  const inner = renderInner(section)
+  const hasBg = !!(section.style?.bgColor || section.style?.gradient)
+  const inner = renderInner(section, hasBg)
 
-  // Só adiciona wrapper div se houver estilo definido
   if (!hasStyle(section.style)) return inner
 
   return (
@@ -43,16 +43,16 @@ export function SectionRenderer({ section }: Props) {
   )
 }
 
-function renderInner(section: PageSection) {
+function renderInner(section: PageSection, hasBg = false) {
   switch (section.type) {
     case 'hero':
-      return <HeroSection content={section.content as HeroContent} />
+      return <HeroSection content={section.content as HeroContent} hasBg={hasBg} />
     case 'text':
-      return <TextSection content={section.content as TextContent} />
+      return <TextSection content={section.content as TextContent} hasBg={hasBg} />
     case 'cta':
-      return <CTASection content={section.content as CTAContent} />
+      return <CTASection content={section.content as CTAContent} hasBg={hasBg} />
     case 'cards':
-      return <CardsSection content={section.content as CardsContent} />
+      return <CardsSection content={section.content as CardsContent} hasBg={hasBg} />
     case 'faq':
       return <FAQSection content={section.content as FAQContent} />
     case 'depoimentos':

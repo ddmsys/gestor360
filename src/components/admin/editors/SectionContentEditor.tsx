@@ -8,6 +8,10 @@ import { FormContentEditor } from './FormContentEditor'
 import { CTAContentEditor } from './CTAContentEditor'
 import { TextContentEditor } from './TextContentEditor'
 import { FAQContentEditor } from './FAQContentEditor'
+import { DepoimentosContentEditor } from './DepoimentosContentEditor'
+import { AutoresContentEditor } from './AutoresContentEditor'
+import { CapitulosContentEditor } from './CapitulosContentEditor'
+import { FerramentasContentEditor } from './FerramentasContentEditor'
 import { GenericContentEditor } from './GenericContentEditor'
 
 export interface ContentEditorProps {
@@ -16,12 +20,16 @@ export interface ContentEditorProps {
 }
 
 const EDITORS: Partial<Record<SectionType, ComponentType<ContentEditorProps>>> = {
-  hero: HeroContentEditor,
-  cards: CardsContentEditor,
-  form: FormContentEditor,
-  cta: CTAContentEditor,
-  text: TextContentEditor,
-  faq: FAQContentEditor,
+  hero:        HeroContentEditor,
+  cards:       CardsContentEditor,
+  form:        FormContentEditor,
+  cta:         CTAContentEditor,
+  text:        TextContentEditor,
+  faq:         FAQContentEditor,
+  depoimentos: DepoimentosContentEditor,
+  autores:     AutoresContentEditor,
+  capitulos:   CapitulosContentEditor,
+  ferramentas: FerramentasContentEditor,
 }
 
 interface SectionContentEditorProps {

@@ -57,6 +57,11 @@ export function buildSectionStyle(style: SectionStyle = {}): CSSProperties {
     // ── CSS Custom Properties (tokens de seção) ────────────────────────────
     // Componentes filhos podem consumir via var(--section-title-color), etc.
     ...({
+      '--section-bg-color':       style.gradient
+        ? style.gradient
+        : style.bgColor
+          ? hexWithOpacity(style.bgColor, style.bgOpacity ?? 100)
+          : undefined,
       '--section-title-color':    style.titleColor   ?? undefined,
       '--section-text-color':     style.textColor    ?? undefined,
       '--section-font-display':   fontPairDef?.display ?? undefined,

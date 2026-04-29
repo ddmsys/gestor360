@@ -3,9 +3,11 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { CTAContent } from '@/types/cms'
 import { fadeInUp } from '@/lib/animations'
+import { renderTitle } from '@/lib/cms/render-title'
 
 interface Props {
   content: CTAContent
+  hasBg?: boolean
 }
 
 const BG_STYLES = {
@@ -41,7 +43,7 @@ const BG_STYLES = {
   section: string; title: string; sub: string; btn: string; btnSec: string
 }>
 
-export function CTASection({ content }: Props) {
+export function CTASection({ content, hasBg = false }: Props) {
   const {
     title,
     subtitle,
@@ -70,7 +72,7 @@ export function CTASection({ content }: Props) {
       viewport={{ once: true, margin: '-80px' }}
     >
       <h2 className={`font-display font-black text-heading leading-tight tracking-tight ${styles.title} max-w-2xl`}>
-        {title}
+        {renderTitle(title)}
       </h2>
 
       {subtitle && (
@@ -102,14 +104,14 @@ export function CTASection({ content }: Props) {
   )
 
   return (
-    <section className={`${styles.section} py-16 sm:py-20`}>
+    <section className={`${hasBg ? '' : styles.section} py-16 sm:py-20`}>
       <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6">
         {hasImage ? (
           // Layout com imagem — side by side
           <div className={`flex flex-col lg:flex-row items-center gap-10 lg:gap-16 ${image_side === 'left' ? 'lg:flex-row-reverse' : ''}`}>
             <div className="flex-1">{textBlock}</div>
             <div className="flex-1 w-full">
-              <div className="relative w-full aspect-video rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-md)]">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-(--shadow-md)">
                 <Image
                   src={image_url}
                   alt={image_alt ?? ''}

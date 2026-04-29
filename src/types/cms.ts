@@ -69,6 +69,15 @@ export interface TextContent {
   bg?: 'white' | 'canvas' | 'ink'
   badge?: string
   badge_color?: 'blue' | 'gold' | 'stone'
+  // Imagem lateral
+  image_url?: string
+  image_alt?: string
+  image_side?: 'left' | 'right'
+  image_ratio?: '1:1' | '4:3' | '16:9'
+  // CTA embutido
+  cta_label?: string
+  cta_url?: string
+  cta_style?: 'primary' | 'secondary' | 'ghost'
 }
 
 export interface CardItem {

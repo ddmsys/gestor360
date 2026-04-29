@@ -2,9 +2,11 @@ import { motion } from "framer-motion";
 import type { CardsContent } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { renderTitle } from "@/lib/cms/render-title";
 
 interface Props {
-  content: CardsContent;
+  content: CardsContent
+  hasBg?: boolean
 }
 
 const BG_STYLES: Record<string, string> = {
@@ -38,7 +40,7 @@ const CARD_STYLE: Record<string, string> = {
   flat: "bg-[var(--color-bg-canvas)]",
 };
 
-export function CardsSection({ content }: Props) {
+export function CardsSection({ content, hasBg = false }: Props) {
   const {
     title,
     subtitle,
@@ -56,7 +58,7 @@ export function CardsSection({ content }: Props) {
   const cardClass = CARD_STYLE[card_style] ?? CARD_STYLE.shadow;
 
   return (
-    <section className={`${bgClass} py-16 sm:py-20`}>
+    <section className={`${hasBg ? '' : bgClass} py-16 sm:py-20`}>
       <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6">
         {/* Cabeçalho */}
         {(badge || title || subtitle) && (
@@ -76,7 +78,7 @@ export function CardsSection({ content }: Props) {
               <h2
                 className={`font-display font-black text-heading leading-tight tracking-tight ${textClass.title} max-w-2xl`}
               >
-                {title}
+                {renderTitle(title)}
               </h2>
             )}
             {subtitle && (
@@ -102,7 +104,7 @@ export function CardsSection({ content }: Props) {
             <motion.li
               key={i}
               variants={fadeInUp}
-              className={`rounded-[var(--radius-lg)] p-6 flex flex-col gap-3 ${cardClass}`}
+              className={`rounded-lg p-6 flex flex-col gap-3 ${cardClass}`}
             >
               {item.icon && (
                 <span className="text-3xl leading-none" aria-hidden="true">
@@ -114,10 +116,10 @@ export function CardsSection({ content }: Props) {
                   {item.badge}
                 </Badge>
               )}
-              <h3 className="font-display font-bold text-title text-[var(--color-text-title)] leading-snug">
+              <h3 className="font-display font-bold text-title text-(--color-text-title) leading-snug">
                 {item.title}
               </h3>
-              <p className="text-sm text-[var(--color-text-body)] leading-relaxed flex-1">
+              <p className="text-sm text-text-body leading-relaxed flex-1">
                 {item.description}
               </p>
               {item.link_url && item.link_label && (

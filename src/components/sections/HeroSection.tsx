@@ -5,9 +5,11 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { HeroContent } from '@/types/cms'
 import { digit3, digit6, digit0, fadeInUp } from '@/lib/animations'
+import { renderTitle } from '@/lib/cms/render-title'
 
 interface Props {
   content: HeroContent
+  hasBg?: boolean
 }
 
 // Mapa de variante → classes de fundo e texto
@@ -17,7 +19,7 @@ const VARIANT_STYLES = {
   blue:   { bg: 'bg-brand-blue', text: 'text-white', muted: 'text-white/80' },
 } satisfies Record<NonNullable<HeroContent['variant']>, { bg: string; text: string; muted: string }>
 
-export function HeroSection({ content }: Props) {
+export function HeroSection({ content, hasBg = false }: Props) {
   const {
     title,
     subtitle,
@@ -43,7 +45,7 @@ export function HeroSection({ content }: Props) {
 
   return (
     <section
-      className={`relative overflow-hidden ${styles.bg} ${styles.text}`}
+      className={`relative overflow-hidden ${hasBg ? '' : styles.bg} ${styles.text}`}
       aria-label="Seção hero"
     >
       {/* Vídeo de fundo */}
@@ -121,7 +123,7 @@ export function HeroSection({ content }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: show_360_animation ? 0.8 : 0 }}
         >
-          {title}
+          {renderTitle(title)}
         </motion.h1>
 
         {/* Subtítulo */}
