@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { isAllowedAdmin } from '@/lib/admin/auth'
+import { requireAdmin } from '@/lib/admin/auth'
+import { buildSectionContent } from '@/lib/cms/section-builder'
 import type { SectionType, SectionContent } from '@/types/cms'
 
 const PAGES_SEED = [
@@ -16,9 +16,8 @@ const PAGES_SEED = [
 ]
 
 export async function seedPaginas() {
-  const supabase = await requireAdmin()
+  await requireAdmin()
   const admin = createAdminClient()
-  void supabase
 
   for (const page of PAGES_SEED) {
     await admin
@@ -57,13 +56,6 @@ export async function seedPaginas() {
   revalidatePath('/admin')
   revalidatePath('/admin/paginas')
   redirect('/admin/paginas?success=seed-ok')
-}
-
-async function requireAdmin() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!isAllowedAdmin(user)) redirect('/login?error=unauthorized')
-  return supabase
 }
 
 function str(formData: FormData, key: string) {
@@ -155,14 +147,14 @@ export async function createSection(formData: FormData) {
 
   const page_id = str(formData, 'page_id')
   const type = str(formData, 'type') as SectionType
-  const contentRaw = str(formData, 'content_json')
 
   let content: SectionContent
   try {
-    content = JSON.parse(contentRaw)
-  } catch {
+    content = buildSectionContent(type, formData)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Conteudo invalido.'
     redirect(
-      `/admin/paginas/${page_id}/secoes/nova?type=${type}&error=${encodeURIComponent('JSON inválido — verifique a sintaxe.')}`,
+      `/admin/paginas/${page_id}/secoes/nova?type=${type}&error=${encodeURIComponent(message)}`,
     )
   }
 
@@ -194,14 +186,15 @@ export async function updateSection(formData: FormData) {
 
   const section_id = str(formData, 'section_id')
   const page_id = str(formData, 'page_id')
-  const contentRaw = str(formData, 'content_json')
+  const type = str(formData, 'type') as SectionType
 
   let content: SectionContent
   try {
-    content = JSON.parse(contentRaw)
-  } catch {
+    content = buildSectionContent(type, formData)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Conteudo invalido.'
     redirect(
-      `/admin/paginas/${page_id}/secoes/${section_id}?error=${encodeURIComponent('JSON inválido — verifique a sintaxe.')}`,
+      `/admin/paginas/${page_id}/secoes/${section_id}?error=${encodeURIComponent(message)}`,
     )
   }
 

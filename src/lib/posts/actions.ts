@@ -3,8 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { isAllowedAdmin } from '@/lib/admin/auth'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/admin/auth'
 
 const postSchema = z.object({
   slug: z
@@ -19,15 +18,6 @@ const postSchema = z.object({
   cover_url: z.string().trim().max(500).optional(),
   status: z.enum(['draft', 'published']),
 })
-
-async function requireAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!isAllowedAdmin(user)) redirect('/login?error=unauthorized')
-  return supabase
-}
 
 function normalizeOptional(v: string | undefined) {
   return v && v.length > 0 ? v : null

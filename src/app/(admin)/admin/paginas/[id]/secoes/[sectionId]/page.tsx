@@ -2,20 +2,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { updateSection } from '@/lib/paginas/actions'
-import type { SectionType } from '@/types/cms'
-
-const TYPE_LABELS: Record<SectionType, string> = {
-  hero: 'Hero',
-  text: 'Texto',
-  cards: 'Cards',
-  ferramentas: 'Ferramentas',
-  form: 'Formulário',
-  faq: 'FAQ',
-  cta: 'CTA',
-  depoimentos: 'Depoimentos',
-  capitulos: 'Capítulos',
-  autores: 'Autores',
-}
+import { SECTION_TYPE_LABELS } from '@/lib/cms/section-builder'
+import { SectionContentForm } from '@/components/forms/SectionContentForm'
+import type { SectionContent, SectionType } from '@/types/cms'
 
 interface Props {
   params: Promise<{ id: string; sectionId: string }>
@@ -36,18 +25,17 @@ export default async function EditSectionPage({ params, searchParams }: Props) {
 
   if (!section) notFound()
 
-  const typeLabel = TYPE_LABELS[section.type as SectionType] ?? section.type
-  const contentJson = JSON.stringify(section.content, null, 2)
+  const sectionType = section.type as SectionType
+  const typeLabel = SECTION_TYPE_LABELS[sectionType] ?? section.type
 
   return (
-    <div className="max-w-3xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-3 mb-8 flex-wrap">
+    <div className="max-w-5xl">
+      <div className="mb-8 flex flex-wrap items-center gap-3">
         <Link
           href="/admin/paginas"
           className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]"
         >
-          ← Páginas
+          Voltar para paginas
         </Link>
         <span className="text-[var(--color-border)]">/</span>
         <Link
@@ -57,64 +45,26 @@ export default async function EditSectionPage({ params, searchParams }: Props) {
           Editor
         </Link>
         <span className="text-[var(--color-border)]">/</span>
-        <h1 className="font-display font-black text-2xl text-[var(--color-text-title)]">
-          Editar — {typeLabel}
+        <h1 className="font-display text-2xl font-black text-[var(--color-text-title)]">
+          Editar modulo - {typeLabel}
         </h1>
       </div>
 
       {error && (
-        <div className="mb-6 rounded-[var(--radius-md)] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {decodeURIComponent(error)}
         </div>
       )}
 
-      <form action={updateSection} className="space-y-4">
-        <input type="hidden" name="section_id" value={sectionId} />
-        <input type="hidden" name="page_id" value={pageId} />
-
-        <div className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] overflow-hidden">
-          <div className="px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg-canvas)] flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-              Conteúdo JSON — {typeLabel}
-            </p>
-            <p className="text-xs text-[var(--color-text-muted)]">
-              Edite os valores — mantenha a estrutura
-            </p>
-          </div>
-          <textarea
-            name="content_json"
-            rows={24}
-            required
-            defaultValue={contentJson}
-            spellCheck={false}
-            className="w-full px-4 py-3 font-mono text-sm text-[var(--color-text-body)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--color-brand-blue)] resize-y"
-            aria-label="Conteúdo da seção em JSON"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Link
-            href={`/admin/paginas/${pageId}`}
-            className="text-sm font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]"
-          >
-            ← Voltar ao editor
-          </Link>
-          <div className="flex items-center gap-3">
-            <a
-              href={`/admin/paginas/${pageId}/secoes/nova?type=${section.type}`}
-              className="px-4 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]"
-            >
-              Ver template
-            </a>
-            <button
-              type="submit"
-              className="inline-flex items-center rounded-[var(--radius-md)] bg-[var(--color-brand-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-blue)] hover:bg-[var(--color-brand-blue-hover)] transition-colors"
-            >
-              Salvar alterações →
-            </button>
-          </div>
-        </div>
-      </form>
+      <SectionContentForm
+        action={updateSection}
+        type={sectionType}
+        pageId={pageId}
+        sectionId={sectionId}
+        content={section.content as SectionContent}
+        submitLabel="Salvar modulo"
+        cancelHref={`/admin/paginas/${pageId}`}
+      />
     </div>
   )
 }

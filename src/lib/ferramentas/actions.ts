@@ -3,9 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { isAllowedAdmin } from '@/lib/admin/auth'
+import { requireAdmin } from '@/lib/admin/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 
 const FERRAMENTAS_BUCKET = 'ferramentas-pdf'
 
@@ -81,17 +80,6 @@ function getUploadedFile(formData: FormData) {
   const file = formData.get('arquivo_file')
   if (!(file instanceof File) || file.size === 0) return null
   return file
-}
-
-async function requireAdminUser() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!isAllowedAdmin(user)) {
-    redirect('/login?error=unauthorized')
-  }
 }
 
 async function ensureFerramentasBucket() {
@@ -173,7 +161,7 @@ function parseFerramentaForm(formData: FormData) {
 }
 
 export async function createFerramenta(formData: FormData) {
-  await requireAdminUser()
+  const supabase = await requireAdmin()
   const parsedPayload = parseFerramentaForm(formData)
   let payload: typeof parsedPayload
   try {
@@ -182,7 +170,6 @@ export async function createFerramenta(formData: FormData) {
     const message = error instanceof Error ? error.message : 'Erro ao enviar arquivo.'
     redirect(`/admin/ferramentas?error=${encodeURIComponent(message)}`)
   }
-  const supabase = await createClient()
 
   const { error } = await supabase.from('ferramentas').insert(payload)
 
@@ -195,7 +182,7 @@ export async function createFerramenta(formData: FormData) {
 }
 
 export async function updateFerramenta(id: string, formData: FormData) {
-  await requireAdminUser()
+  const supabase = await requireAdmin()
   const parsedPayload = parseFerramentaForm(formData)
   let payload: typeof parsedPayload
   try {
@@ -204,7 +191,6 @@ export async function updateFerramenta(id: string, formData: FormData) {
     const message = error instanceof Error ? error.message : 'Erro ao enviar arquivo.'
     redirect(`/admin/ferramentas/${id}?error=${encodeURIComponent(message)}`)
   }
-  const supabase = await createClient()
 
   const { error } = await supabase
     .from('ferramentas')
@@ -221,8 +207,7 @@ export async function updateFerramenta(id: string, formData: FormData) {
 }
 
 export async function deleteFerramenta(id: string) {
-  await requireAdminUser()
-  const supabase = await createClient()
+  const supabase = await requireAdmin()
   const { error } = await supabase.from('ferramentas').delete().eq('id', id)
 
   if (error) {

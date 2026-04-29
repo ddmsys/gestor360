@@ -2,14 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { isAllowedAdmin } from '@/lib/admin/auth'
+import { requireAdmin } from '@/lib/admin/auth'
 import type { DesignConfig } from './config'
 
 export async function saveDesignConfig(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!isAllowedAdmin(user)) redirect('/login?error=unauthorized')
+  const supabase = await requireAdmin()
 
   const config: DesignConfig = {
     palette: (String(formData.get('palette') ?? 'default')) as DesignConfig['palette'],

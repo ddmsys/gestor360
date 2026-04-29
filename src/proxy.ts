@@ -1,5 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
+
+async function isAdminUserInDb(email: string): Promise<boolean> {
+  try {
+    const admin = createSupabaseAdmin(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+    const { data } = await admin
+      .from('admin_users')
+      .select('ativo')
+      .eq('email', email.toLowerCase())
+      .eq('ativo', true)
+      .single()
+    return !!data
+  } catch {
+    return false
+  }
+}
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -35,12 +55,16 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
-    const allowedEmails = (process.env.ADMIN_EMAILS ?? process.env.ADMIN_EMAIL ?? '')
-      .split(',')
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean)
+    const email = user.email?.toLowerCase() ?? ''
 
-    if (allowedEmails.length > 0 && !allowedEmails.includes(user.email?.toLowerCase() ?? '')) {
+    // Super admins via env var
+    const envEmails = (process.env.ADMIN_EMAILS ?? process.env.ADMIN_EMAIL ?? '')
+      .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+
+    const isEnvAdmin = envEmails.length > 0 && envEmails.includes(email)
+    const isDbAdmin = isEnvAdmin ? false : await isAdminUserInDb(email)
+
+    if (!isEnvAdmin && !isDbAdmin) {
       return NextResponse.redirect(new URL('/login?error=unauthorized', request.url))
     }
   }
