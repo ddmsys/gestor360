@@ -13,9 +13,8 @@ const schema = z.object({
   email: z.string().email('E-mail inválido'),
   whatsapp: z
     .string()
-    .regex(/^\+?[\d\s\-()]{10,15}$/, 'Número inválido')
-    .optional()
-    .or(z.literal('')),
+    .min(1, 'WhatsApp é obrigatório')
+    .regex(/^\+?[\d\s\-()]{10,15}$/, 'Número inválido'),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -125,9 +124,10 @@ export function LeadForm({ capituloOrigem, consentSource, utmParams }: LeadFormP
         label="WhatsApp"
         type="tel"
         placeholder="(11) 9 0000-0000"
+        required
         autoComplete="tel"
         inputMode="tel"
-        hint="Opcional — para receber as ferramentas também no WhatsApp"
+        hint="Vamos te enviar as ferramentas também no WhatsApp"
         error={errors.whatsapp?.message}
         {...register('whatsapp')}
       />

@@ -5,10 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 const leadSchema = z.object({
   nome: z.string().min(2).max(120).trim(),
   email: z.string().email().toLowerCase().trim(),
-  whatsapp: z.preprocess(
-    (v) => (v === '' ? undefined : v),
-    z.string().regex(/^\+?[\d\s\-()]{10,15}$/).optional()
-  ),
+  whatsapp: z.string().regex(/^\+?[\d\s\-()]{10,15}$/, 'Número de WhatsApp inválido'),
   capitulo_origem: z.number().int().min(1).max(10).optional(),
   consent_source: z.string().min(1).max(100),
   metadata: z.record(z.string(), z.string()).optional().default({}),
@@ -55,7 +52,7 @@ export async function POST(request: Request) {
   const { error: dbError } = await supabase.from('leads').insert({
     nome,
     email,
-    whatsapp: whatsapp || null,
+    whatsapp,
     capitulo_origem: capitulo_origem ?? null,
     consent_source,
     consent_at: new Date().toISOString(),
