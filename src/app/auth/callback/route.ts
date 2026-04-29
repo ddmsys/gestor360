@@ -3,22 +3,36 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const type = searchParams.get('type') // 'recovery' para redefinição de senha
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+  // Fluxo de e-mail: confirmação de cadastro e recuperação de senha
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
+
+  // Fluxo OAuth (Google, GitHub etc.) — mantido para o futuro
+  const code = searchParams.get('code')
+
+  const supabase = await createClient()
+
+  if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash,
+      type: type as 'email' | 'recovery' | 'invite' | 'magiclink',
+    })
 
     if (!error) {
       if (type === 'recovery') {
         return NextResponse.redirect(`${origin}/login/nova-senha`)
       }
-      // Confirmação de cadastro ou login com link mágico
       return NextResponse.redirect(`${origin}/admin`)
     }
   }
 
-  // Em caso de erro ou code ausente, volta para o login com mensagem
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      return NextResponse.redirect(`${origin}/admin`)
+    }
+  }
+
   return NextResponse.redirect(`${origin}/login?error=link-invalido`)
 }
