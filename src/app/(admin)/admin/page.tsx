@@ -1,8 +1,14 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/Badge'
+import { seedPaginas } from '@/lib/paginas/actions'
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string }>
+}) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const [
@@ -25,9 +31,15 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display font-black text-[var(--text-heading)] text-[var(--color-text-title)]">
+      <h1 className="font-display font-black text-2xl text-[var(--color-text-title)]">
         Dashboard
       </h1>
+
+      {params.success === 'seed-ok' && (
+        <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-[var(--radius-md)]">
+          Páginas iniciais criadas com sucesso. Edite cada uma para adicionar conteúdo.
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -59,11 +71,27 @@ export default async function AdminDashboard() {
 
         <div className="bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] border border-[var(--color-border)] overflow-hidden">
           {!pages || pages.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-sm text-[var(--color-text-muted)] mb-3">Nenhuma página criada ainda.</p>
-              <Link href="/admin/paginas/nova" className="text-sm font-semibold text-[var(--color-brand-blue)] hover:underline">
-                Criar primeira página →
-              </Link>
+            <div className="p-8 text-center space-y-4">
+              <p className="text-sm text-[var(--color-text-muted)]">Nenhuma página criada ainda.</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <form action={seedPaginas}>
+                  <button
+                    type="submit"
+                    className="text-sm font-semibold bg-[var(--color-brand-blue)] text-white px-4 py-2 rounded-[var(--radius-md)] hover:opacity-90 transition-opacity"
+                  >
+                    Criar páginas iniciais do site
+                  </button>
+                </form>
+                <Link
+                  href="/admin/paginas/nova"
+                  className="text-sm font-semibold text-[var(--color-brand-blue)] hover:underline"
+                >
+                  Ou criar página manualmente →
+                </Link>
+              </div>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                Cria: Home, Método, Sobre, Mentoria e Livro (todas como rascunho)
+              </p>
             </div>
           ) : (
             <table className="w-full text-sm">
