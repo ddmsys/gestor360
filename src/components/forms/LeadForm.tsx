@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { FerramentasLibrary } from '@/components/sections/FerramentasLibrary'
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome precisa ter ao menos 2 caracteres'),
@@ -27,6 +28,7 @@ interface LeadFormProps {
 
 interface SuccessData {
   mensagem: string
+  ferramentas?: React.ComponentProps<typeof FerramentasLibrary>['ferramentas']
 }
 
 export function LeadForm({ capituloOrigem, consentSource, utmParams }: LeadFormProps) {
@@ -82,12 +84,17 @@ export function LeadForm({ capituloOrigem, consentSource, utmParams }: LeadFormP
         </p>
         <div className="mt-5 rounded-[var(--radius-md)] border border-success/20 bg-white/70 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-success">
-            Próximo passo
+            Acesso liberado
           </p>
           <p className="mt-2 text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-body)]">
-            Confira a caixa de entrada e o spam. O e-mail chega pelo remetente oficial contato@ogestor360.com.
+            Você também receberá este link por e-mail para voltar depois.
           </p>
         </div>
+        {success.ferramentas && (
+          <div className="mt-6">
+            <FerramentasLibrary ferramentas={success.ferramentas} />
+          </div>
+        )}
       </div>
     )
   }

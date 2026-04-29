@@ -14,6 +14,23 @@ const leadSchema = z.object({
   metadata: z.record(z.string(), z.string()).optional().default({}),
 })
 
+async function getFerramentasPublicadas() {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('ferramentas')
+    .select('id, numero, nome, descricao, capitulo, arquivo_path, tipo, cor')
+    .eq('status', 'published')
+    .eq('ativo', true)
+    .eq('acesso', 'gratuito')
+    .not('arquivo_path', 'is', null)
+    .order('tipo', { ascending: false })
+    .order('capitulo', { ascending: true })
+    .order('ordem', { ascending: true })
+    .order('numero', { ascending: true })
+
+  return data ?? []
+}
+
 export async function POST(request: Request) {
   let body: unknown
   try {
@@ -73,11 +90,12 @@ export async function POST(request: Request) {
     try {
       const { Resend } = await import('resend')
       const resend = new Resend(process.env.RESEND_API_KEY)
+      const accessUrl = 'https://ogestor360.com/ferramentas?acesso=liberado'
       await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL ?? 'noreply@ogestor360.com',
         to: email,
-        subject: 'Suas ferramentas Gestor360® chegaram! 🎯',
-        text: `Olá ${nome},\n\nSuas ferramentas estão a caminho.\n\nEquipe Gestor360®`,
+        subject: 'Seu acesso às ferramentas do Gestor360®',
+        text: `Olá ${nome},\n\nSeu cadastro foi confirmado.\n\nAcesse suas ferramentas aqui:\n${accessUrl}\n\nEquipe Gestor360®`,
       })
     } catch (emailError) {
       console.error('[api/leads] Email error (non-fatal):', emailError)
@@ -88,6 +106,7 @@ export async function POST(request: Request) {
     {
       mensagem: `Perfeito, ${nome}! Verifique seu e-mail em até 2 minutos.`,
       capitulo_origem: capitulo_origem ?? null,
+      ferramentas: await getFerramentasPublicadas(),
     },
     { status: 201 }
   )

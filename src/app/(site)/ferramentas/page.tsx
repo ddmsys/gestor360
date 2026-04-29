@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { LeadForm } from '@/components/forms/LeadForm'
+import { FerramentasLibrary } from '@/components/sections/FerramentasLibrary'
 import { Badge } from '@/components/ui/Badge'
 import { Logo } from '@/components/ui/Logo'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const metadata: Metadata = {
   title: 'Ferramentas Práticas do Gestor360®',
@@ -22,14 +24,45 @@ const capitulos: Record<number, { titulo: string; ferramentas: string }> = {
   10: { titulo: 'Indicadores e Inovação',       ferramentas: 'OKRs · PDCA · Canvas da Inovação Ágil' },
 }
 
+interface FerramentaPublica {
+  id: string
+  numero: number
+  nome: string
+  descricao: string | null
+  capitulo: number
+  arquivo_path: string | null
+  tipo: string | null
+  cor: string | null
+}
+
 interface Props {
-  searchParams: Promise<{ capitulo?: string; utm_source?: string; utm_medium?: string; utm_campaign?: string }>
+  searchParams: Promise<{ capitulo?: string; utm_source?: string; utm_medium?: string; utm_campaign?: string; acesso?: string }>
+}
+
+async function getFerramentasPublicadas() {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('ferramentas')
+    .select('id, numero, nome, descricao, capitulo, arquivo_path, tipo, cor')
+    .eq('status', 'published')
+    .eq('ativo', true)
+    .eq('acesso', 'gratuito')
+    .not('arquivo_path', 'is', null)
+    .order('tipo', { ascending: false })
+    .order('capitulo', { ascending: true })
+    .order('ordem', { ascending: true })
+    .order('numero', { ascending: true })
+    .returns<FerramentaPublica[]>()
+
+  return data ?? []
 }
 
 export default async function FerramentasPage({ searchParams }: Props) {
   const params = await searchParams
   const capitulo = Number(params.capitulo)
   const capInfo = capitulos[capitulo] ?? null
+  const acessoLiberado = params.acesso === 'liberado'
+  const ferramentas = acessoLiberado ? await getFerramentasPublicadas() : []
 
   const utmParams: Record<string, string> = {}
   if (params.utm_source)   utmParams.utm_source   = params.utm_source
@@ -153,6 +186,12 @@ export default async function FerramentasPage({ searchParams }: Props) {
           />
         </section>
       </div>
+
+      {acessoLiberado && (
+        <div className="mx-auto max-w-[var(--container-xl)] px-4 pb-14 sm:px-6">
+          <FerramentasLibrary ferramentas={ferramentas} />
+        </div>
+      )}
     </div>
   )
 }
