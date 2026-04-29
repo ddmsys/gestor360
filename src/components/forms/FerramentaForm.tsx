@@ -116,11 +116,11 @@ export function FerramentaForm({
       />
 
       <Input
-        label="Enviar PDF ou ZIP"
+        label="Enviar arquivo"
         name="arquivo_file"
         type="file"
-        accept="application/pdf,application/zip,.pdf,.zip"
-        hint="O arquivo vai direto para o bucket privado ferramentas-pdf. Limite atual: 25 MB por arquivo."
+        accept=".pdf,.zip,.docx,.xlsx,.pptx,.doc,.xls,.mp4,.mov,.avi,.webm,.mp3,.jpg,.jpeg,.png"
+        hint="PDF, ZIP, Word, Excel, PowerPoint, MP4, MP3, imagens — limite: 500 MB por arquivo."
       />
 
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_160px]">

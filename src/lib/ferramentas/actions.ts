@@ -9,6 +9,29 @@ import { createClient } from '@/lib/supabase/server'
 
 const FERRAMENTAS_BUCKET = 'ferramentas-pdf'
 
+const BUCKET_CONFIG = {
+  public: false,
+  fileSizeLimit: 500 * 1024 * 1024, // 500 MB
+  allowedMimeTypes: [
+    'application/pdf',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/octet-stream',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',       // .xlsx
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+    'application/msword',                                                       // .doc
+    'application/vnd.ms-excel',                                                 // .xls
+    'video/mp4',
+    'video/quicktime',   // .mov
+    'video/x-msvideo',   // .avi
+    'video/webm',
+    'audio/mpeg',        // .mp3
+    'image/jpeg',
+    'image/png',
+  ],
+}
+
 const ferramentaSchema = z.object({
   numero: z.coerce.number().int().min(1, 'Informe o número.').max(999),
   nome: z.string().trim().min(2, 'Informe o nome da ferramenta.').max(160),
@@ -75,22 +98,17 @@ async function ensureFerramentasBucket() {
   const supabaseAdmin = createAdminClient()
   const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets()
 
-  if (listError) {
-    throw new Error(listError.message)
-  }
+  if (listError) throw new Error(listError.message)
 
-  if (buckets.some((bucket) => bucket.name === FERRAMENTAS_BUCKET)) {
-    return supabaseAdmin
-  }
+  const exists = buckets.some((b) => b.name === FERRAMENTAS_BUCKET)
 
-  const { error: createError } = await supabaseAdmin.storage.createBucket(FERRAMENTAS_BUCKET, {
-    public: false,
-    fileSizeLimit: 25 * 1024 * 1024,
-    allowedMimeTypes: ['application/pdf', 'application/zip', 'application/x-zip-compressed'],
-  })
-
-  if (createError) {
-    throw new Error(createError.message)
+  if (exists) {
+    // Atualiza configurações do bucket existente (limite e tipos aceitos)
+    const { error } = await supabaseAdmin.storage.updateBucket(FERRAMENTAS_BUCKET, BUCKET_CONFIG)
+    if (error) throw new Error(error.message)
+  } else {
+    const { error } = await supabaseAdmin.storage.createBucket(FERRAMENTAS_BUCKET, BUCKET_CONFIG)
+    if (error) throw new Error(error.message)
   }
 
   return supabaseAdmin
