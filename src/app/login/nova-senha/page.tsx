@@ -29,13 +29,14 @@ export default function NovaSenhaPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    // O callback /auth/callback já trocou o code por sessão.
+    // Verificamos se há uma sessão ativa — se sim, o usuário pode redefinir a senha.
     const supabase = createClient()
-    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setPronto(true)
       }
     })
-    return () => listener.subscription.unsubscribe()
   }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -106,7 +107,7 @@ export default function NovaSenhaPage() {
             {!pronto ? (
               <div className="mt-6">
                 <p className="text-sm leading-[var(--leading-relaxed)] text-[var(--color-text-muted)]">
-                  Aguardando verificação do link… Se este formulário não carregar, o link pode ter expirado.{' '}
+                  Verificando o link de recuperação… Se este formulário não carregar, o link pode ter expirado.{' '}
                   <a
                     href="/login/redefinir-senha"
                     className="text-brand-blue underline-offset-2 hover:underline"

@@ -32,7 +32,9 @@ export function LoginForm() {
   const [error, setError] = useState(
     initialError === 'unauthorized'
       ? 'Este e-mail não tem permissão para acessar o admin. Solicite acesso ao administrador.'
-      : ''
+      : initialError === 'link-invalido'
+        ? 'O link de confirmação é inválido ou expirou. Tente novamente.'
+        : ''
   )
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -63,7 +65,13 @@ export function LoginForm() {
     }
 
     const supabase = createClient()
-    const { error: signUpError } = await supabase.auth.signUp({ email, password })
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
 
     if (signUpError) {
       if (signUpError.message.includes('already registered')) {

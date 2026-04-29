@@ -31,6 +31,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'transition-colors duration-[var(--transition-fast)]',
             'focus:outline-none focus:border-brand-blue focus:ring-[var(--focus-ring)]',
             'disabled:opacity-50 disabled:bg-[var(--color-bg-canvas)]',
+            '[&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-[var(--color-text-title)]',
+            '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_white]',
             'min-h-[var(--touch-target-min)]',
             error ? 'border-error focus:border-error' : '',
             className,

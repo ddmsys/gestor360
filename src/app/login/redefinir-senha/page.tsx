@@ -34,7 +34,7 @@ export default function RedefinirSenhaPage() {
     const supabase = createClient()
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       parsed.data.email,
-      { redirectTo: `${window.location.origin}/login/nova-senha` },
+      { redirectTo: `${window.location.origin}/auth/callback?type=recovery` },
     )
 
     if (resetError) {
