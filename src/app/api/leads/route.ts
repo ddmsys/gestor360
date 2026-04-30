@@ -11,23 +11,6 @@ const leadSchema = z.object({
   metadata: z.record(z.string(), z.string()).optional().default({}),
 })
 
-async function getFerramentasPublicadas() {
-  const supabase = createAdminClient()
-  const { data } = await supabase
-    .from('ferramentas')
-    .select('id, numero, nome, descricao, capitulo, arquivo_path, tipo, cor')
-    .eq('status', 'published')
-    .eq('ativo', true)
-    .eq('acesso', 'gratuito')
-    .not('arquivo_path', 'is', null)
-    .order('tipo', { ascending: false })
-    .order('capitulo', { ascending: true })
-    .order('ordem', { ascending: true })
-    .order('numero', { ascending: true })
-
-  return data ?? []
-}
-
 export async function POST(request: Request) {
   let body: unknown
   try {
@@ -63,36 +46,33 @@ export async function POST(request: Request) {
   })
 
   if (dbError) {
-    // E-mail já cadastrado (unique constraint)
     if (dbError.code === '23505') {
       return NextResponse.json(
         { mensagem: 'E-mail já cadastrado! Verifique sua caixa de entrada.' },
         { status: 200 }
       )
     }
-    console.error('[api/leads] DB error:', {
-      code: dbError.code,
-      message: dbError.message,
-      details: dbError.details,
-      hint: dbError.hint,
-    })
+    console.error('[api/leads] DB error:', dbError)
     return NextResponse.json(
       { error: 'Erro ao salvar. Tente novamente.' },
       { status: 500 }
     )
   }
 
-  // Envia e-mail de boas-vindas se Resend estiver configurado
   if (process.env.RESEND_API_KEY) {
     try {
       const { Resend } = await import('resend')
+      const { render } = await import('@react-email/render')
+      const { default: BoasVindas } = await import('@/emails/BoasVindas')
+
       const resend = new Resend(process.env.RESEND_API_KEY)
-      const accessUrl = 'https://ogestor360.com/ferramentas?acesso=liberado'
+      const html = await render(BoasVindas({ nome }))
+
       await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL ?? 'noreply@ogestor360.com',
         to: email,
-        subject: 'Seu acesso às ferramentas do Gestor360®',
-        text: `Olá ${nome},\n\nSeu cadastro foi confirmado.\n\nAcesse suas ferramentas aqui:\n${accessUrl}\n\nEquipe Gestor360®`,
+        subject: 'Suas ferramentas do Gestor360® chegaram 🎉',
+        html,
       })
     } catch (emailError) {
       console.error('[api/leads] Email error (non-fatal):', emailError)
@@ -100,11 +80,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    {
-      mensagem: `Perfeito, ${nome}! Verifique seu e-mail em até 2 minutos.`,
-      capitulo_origem: capitulo_origem ?? null,
-      ferramentas: await getFerramentasPublicadas(),
-    },
+    { mensagem: `Perfeito, ${nome}! Enviamos o link das ferramentas para o seu e-mail.` },
     { status: 201 }
   )
 }
