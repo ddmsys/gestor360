@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "oGestor360® — Página inicial" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "oGestor360®" [ref=e5]
+      - navigation "Navegação principal" [ref=e6]:
+        - list [ref=e7]:
+          - listitem [ref=e8]:
+            - link "O Método" [ref=e9] [cursor=pointer]:
+              - /url: /metodo
+          - listitem [ref=e10]:
+            - link "Ferramentas" [ref=e11] [cursor=pointer]:
+              - /url: /ferramentas
+          - listitem [ref=e12]:
+            - link "O Livro" [ref=e13] [cursor=pointer]:
+              - /url: /livro
+          - listitem [ref=e14]:
+            - link "Sobre" [ref=e15] [cursor=pointer]:
+              - /url: /sobre
+      - link "Acessar ferramentas" [ref=e16] [cursor=pointer]:
+        - /url: /ferramentas
+  - main [ref=e17]:
+    - generic [ref=e18]:
+      - heading "360" [level=1] [ref=e19]
+      - paragraph [ref=e20]: Em breve — o método que transforma quem lidera.
+  - contentinfo [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - link "oGestor360® — Página inicial" [ref=e24] [cursor=pointer]:
+          - /url: /
+          - img "oGestor360®" [ref=e26]
+        - paragraph [ref=e27]: O método que une razão e alma para transformar quem lidera.
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: Navegação
+        - list [ref=e30]:
+          - listitem [ref=e31]:
+            - link "O Método" [ref=e32] [cursor=pointer]:
+              - /url: /metodo
+          - listitem [ref=e33]:
+            - link "Ferramentas" [ref=e34] [cursor=pointer]:
+              - /url: /ferramentas
+          - listitem [ref=e35]:
+            - link "O Livro" [ref=e36] [cursor=pointer]:
+              - /url: /livro
+          - listitem [ref=e37]:
+            - link "Sobre" [ref=e38] [cursor=pointer]:
+              - /url: /sobre
+      - generic [ref=e39]:
+        - paragraph [ref=e40]: DDM Editora
+        - paragraph [ref=e41]: Rua dos Empreendedores, Brasil
+        - link "contato@ogestor360.com" [ref=e42] [cursor=pointer]:
+          - /url: mailto:contato@ogestor360.com
+    - generic [ref=e44]:
+      - paragraph [ref=e45]: © 2026 oGestor360® — DDM Editora. Todos os direitos reservados.
+      - paragraph [ref=e46]: Livro publicado em abril de 2026
+  - alert [ref=e47]
