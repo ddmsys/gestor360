@@ -71,6 +71,7 @@ export const SectionStyleSchema = z.object({
   border:         z.boolean().optional(),
   borderColor:    hexColorSchema.optional(),
   animation:      z.boolean().optional(),
+  titleTransform: z.enum(['uppercase', 'lowercase', 'capitalize', 'none']).optional(),
 }).strict()
 
 export type SectionStyleInput = z.input<typeof SectionStyleSchema>

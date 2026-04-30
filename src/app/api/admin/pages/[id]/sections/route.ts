@@ -1,5 +1,3 @@
-'use server'
-
 import { createClient } from '@/lib/supabase/server'
 import { SaveSectionsRequestSchema } from '@/lib/cms/style-schemas'
 

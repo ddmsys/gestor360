@@ -92,7 +92,7 @@ export default async function PaginasPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <a
-                        href={`/${page.slug}`}
+                        href={`/preview/${page.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-[var(--color-text-muted)] hover:text-brand-blue"

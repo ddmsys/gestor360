@@ -8,11 +8,12 @@ import { buildSectionContent } from '@/lib/cms/section-builder'
 import type { SectionType, SectionContent } from '@/types/cms'
 
 const PAGES_SEED = [
-  { slug: 'home',     title: 'Home',                description: 'O método que une razão e alma para transformar quem lidera.' },
-  { slug: 'metodo',   title: 'O Método Gestor360®', description: 'Conheça o método completo de liderança consciente para empresários.' },
-  { slug: 'sobre',    title: 'Sobre',               description: 'Quem está por trás do Gestor360® — autores, missão e história.' },
-  { slug: 'mentoria', title: 'Mentoria',            description: 'Mentorias individuais e em grupo com os autores do Gestor360®.' },
-  { slug: 'livro',    title: 'O Livro',             description: 'Manual do Gestor360® — disponível na DDM Editora.' },
+  { slug: 'home',         title: 'Home',                   description: 'O método que une razão e alma para transformar quem lidera.' },
+  { slug: 'metodo',       title: 'O Método Gestor360®',    description: 'Conheça o método completo de liderança consciente para empresários.' },
+  { slug: 'sobre',        title: 'Sobre',                  description: 'Quem está por trás do Gestor360® — autores, missão e história.' },
+  { slug: 'mentoria',     title: 'Mentoria',               description: 'Mentorias individuais e em grupo com os autores do Gestor360®.' },
+  { slug: 'livro',        title: 'O Livro',                description: 'Manual do Gestor360® — disponível na DDM Editora.' },
+  { slug: 'ferramentas',  title: 'Ferramentas do Método',  description: 'As 31 ferramentas práticas do Gestor360® organizadas por capítulo.' },
 ]
 
 export async function seedPaginas() {
