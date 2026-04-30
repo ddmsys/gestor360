@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
-import { isAllowedAdmin } from '@/lib/admin/auth'
+import { isAdminUser } from '@/lib/admin/auth'
 import { createClient } from '@/lib/supabase/server'
 import { Logo } from '@/components/ui/Logo'
 
@@ -92,7 +92,7 @@ async function getAdminUser(): Promise<User> {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user || !isAllowedAdmin(user)) {
+  if (!user || !(await isAdminUser(user.email ?? ''))) {
     await supabase.auth.signOut()
     redirect('/login?error=unauthorized')
   }

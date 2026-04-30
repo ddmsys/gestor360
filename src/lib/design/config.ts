@@ -64,17 +64,17 @@ export const PALETTE_VARS: Record<DesignConfig['palette'], Record<string, string
 }
 
 export const FONT_BODY_VARS: Record<DesignConfig['font_body'], string> = {
-  'dm-sans': "'DM Sans', sans-serif",
-  'inter': "'Inter', sans-serif",
-  'nunito': "'Nunito', sans-serif",
-  'open-sans': "'Open Sans', sans-serif",
+  'dm-sans': "var(--font-dm-sans), sans-serif",
+  'inter': "var(--font-inter), sans-serif",
+  'nunito': "var(--font-nunito), sans-serif",
+  'open-sans': "var(--font-open-sans), sans-serif",
 }
 
 export const FONT_DISPLAY_VARS: Record<DesignConfig['font_display'], string> = {
   'gotham': "'gotham', sans-serif",
-  'oswald': "'Oswald', sans-serif",
-  'montserrat': "'Montserrat', sans-serif",
-  'playfair': "'Playfair Display', serif",
+  'oswald': "var(--font-oswald), sans-serif",
+  'montserrat': "var(--font-montserrat), sans-serif",
+  'playfair': "var(--font-playfair), serif",
 }
 
 export const TYPE_SCALE_VARS: Record<DesignConfig['type_scale'], Record<string, string>> = {
