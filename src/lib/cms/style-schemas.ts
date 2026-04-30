@@ -72,7 +72,7 @@ export const SectionStyleSchema = z.object({
   borderColor:    hexColorSchema.optional(),
   animation:      z.boolean().optional(),
   titleTransform: z.enum(['uppercase', 'lowercase', 'capitalize', 'none']).optional(),
-}).strict()
+})
 
 export type SectionStyleInput = z.input<typeof SectionStyleSchema>
 export type SectionStyleOutput = z.output<typeof SectionStyleSchema>
@@ -104,7 +104,7 @@ export const PageSectionUpsertSchema = z.object({
   ]),
   order_index: z.number().int().min(0),
   content:     z.record(z.string(), z.unknown()),
-  style:       SectionStyleSchema.optional().default({}),
+  style:       SectionStyleSchema.nullish().transform((v) => v ?? {}),
   visible:     z.boolean().default(true),
 })
 

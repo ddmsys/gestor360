@@ -100,6 +100,7 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
   const [showPicker, setShowPicker] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
   const [pageStatus, setPageStatus] = useState<'published' | 'draft'>(page.status)
   const [statusSaving, setStatusSaving] = useState(false)
@@ -216,6 +217,7 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
 
   const handleSave = useCallback(async () => {
     setSaving(true)
+    setSaveError(null)
     try {
       const res = await fetch(`/api/admin/pages/${page.id}/sections`, {
         method: 'PUT',
@@ -226,7 +228,17 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
         setIsDirty(false)
         setSaved(true)
         setTimeout(() => setSaved(false), 2500)
+      } else {
+        const data = await res.json().catch(() => ({}))
+        const msg = data?.error
+          ? typeof data.error === 'string' ? data.error : JSON.stringify(data.error)
+          : `Erro ${res.status}`
+        setSaveError(msg)
+        setTimeout(() => setSaveError(null), 6000)
       }
+    } catch {
+      setSaveError('Erro de conexão. Verifique sua internet.')
+      setTimeout(() => setSaveError(null), 6000)
     } finally {
       setSaving(false)
     }
@@ -289,12 +301,20 @@ export function PageEditorClient({ page, initialSections }: PageEditorClientProp
         <div className="flex-1" />
 
         {/* Indicadores de estado */}
-        {autoSavedAt && !isDirty && (
+        {saveError && (
+          <span className="flex items-center gap-1.5 text-xs text-red-400 shrink-0 mr-1 max-w-70 truncate" title={saveError}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+            </svg>
+            {saveError}
+          </span>
+        )}
+        {autoSavedAt && !isDirty && !saveError && (
           <span className="text-[10px] text-white/35 shrink-0 font-mono">
             Auto-salvo {autoSavedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
-        {isDirty && !saving && (
+        {isDirty && !saving && !saveError && (
           <span className="flex items-center gap-1.5 text-xs text-[var(--color-brand-gold)] shrink-0 mr-1">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-gold)] animate-pulse" />
             Alterações não salvas
