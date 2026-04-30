@@ -100,7 +100,7 @@ export default async function DesignStudioPage({ searchParams }: Props) {
           Design Studio
         </h1>
         <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
-          Personalize a aparência do site — as alterações aplicam ao site público instantaneamente.
+          Personalize a aparência do site — as alterações aplicam ao site público ao salvar.
         </p>
       </div>
 
@@ -123,61 +123,48 @@ export default async function DesignStudioPage({ searchParams }: Props) {
               Paleta de cores
             </h2>
             <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
-              Cada paleta foi desenhada para manter harmonia com a identidade Gestor360.
+              Clique para selecionar. Clique em "Salvar" para aplicar ao site.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {PALETTES.map((palette) => {
-              const isSelected = current.palette === palette.id
-              return (
-                <label
-                  key={palette.id}
-                  className={`relative cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all ${
-                    isSelected
-                      ? 'border-[var(--color-brand-blue)] shadow-[var(--shadow-blue)]'
-                      : 'border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40'
-                  }`}
+            {PALETTES.map((palette) => (
+              <label
+                key={palette.id}
+                className="cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40 [&:has(input:checked)]:border-[var(--color-brand-blue)] [&:has(input:checked)]:shadow-[0_0_0_3px_rgba(31,63,122,0.15)]"
+              >
+                <input
+                  type="radio"
+                  name="palette"
+                  value={palette.id}
+                  defaultChecked={current.palette === palette.id}
+                  className="sr-only"
+                />
+
+                {/* Prévia de cores */}
+                <div
+                  className="h-12 rounded-[var(--radius-md)] mb-3 flex items-center justify-center gap-2 border border-black/10"
+                  style={{ backgroundColor: palette.bg }}
                 >
-                  <input
-                    type="radio"
-                    name="palette"
-                    value={palette.id}
-                    defaultChecked={isSelected}
-                    className="sr-only"
+                  <span
+                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                    style={{ backgroundColor: palette.primary }}
                   />
+                  <span
+                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                    style={{ backgroundColor: palette.accent }}
+                  />
+                </div>
 
-                  {/* Prévia de cores */}
-                  <div
-                    className="h-12 rounded-[var(--radius-md)] mb-3 flex items-center justify-center gap-2 border border-black/10"
-                    style={{ backgroundColor: palette.bg }}
-                  >
-                    <span
-                      className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                      style={{ backgroundColor: palette.primary }}
-                    />
-                    <span
-                      className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                      style={{ backgroundColor: palette.accent }}
-                    />
-                  </div>
-
-                  <p className="font-semibold text-sm text-[var(--color-text-title)]">
-                    {palette.name}
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{palette.desc}</p>
-
-                  {isSelected && (
-                    <span className="absolute top-2 right-2 text-[var(--color-brand-blue)] text-base">
-                      ✓
-                    </span>
-                  )}
-                </label>
-              )
-            })}
+                <p className="font-semibold text-sm text-[var(--color-text-title)]">
+                  {palette.name}
+                </p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{palette.desc}</p>
+              </label>
+            ))}
           </div>
         </section>
 
-        {/* Tipografia — fonte do corpo */}
+        {/* Fonte do corpo */}
         <section className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-6">
           <div className="mb-5">
             <h2 className="font-display font-bold text-lg text-[var(--color-text-title)]">
@@ -188,36 +175,28 @@ export default async function DesignStudioPage({ searchParams }: Props) {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {FONTS_BODY.map((font) => {
-              const isSelected = current.font_body === font.id
-              return (
-                <label
-                  key={font.id}
-                  className={`cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all ${
-                    isSelected
-                      ? 'border-[var(--color-brand-blue)] shadow-[var(--shadow-blue)] bg-blue-50/30'
-                      : 'border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="font_body"
-                    value={font.id}
-                    defaultChecked={isSelected}
-                    className="sr-only"
-                  />
-                  <p className="font-semibold text-sm text-[var(--color-text-title)]">
-                    {font.name}
-                    {isSelected && <span className="ml-2 text-[var(--color-brand-blue)]">✓</span>}
-                  </p>
-                  <p className="text-sm text-[var(--color-text-muted)] mt-1">{font.sample}</p>
-                </label>
-              )
-            })}
+            {FONTS_BODY.map((font) => (
+              <label
+                key={font.id}
+                className="cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40 [&:has(input:checked)]:border-[var(--color-brand-blue)] [&:has(input:checked)]:bg-blue-50/30 [&:has(input:checked)]:shadow-[0_0_0_3px_rgba(31,63,122,0.15)]"
+              >
+                <input
+                  type="radio"
+                  name="font_body"
+                  value={font.id}
+                  defaultChecked={current.font_body === font.id}
+                  className="sr-only"
+                />
+                <p className="font-semibold text-sm text-[var(--color-text-title)]">
+                  {font.name}
+                </p>
+                <p className="text-sm text-[var(--color-text-muted)] mt-1">{font.sample}</p>
+              </label>
+            ))}
           </div>
         </section>
 
-        {/* Tipografia — fonte de título */}
+        {/* Fonte dos títulos */}
         <section className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-6">
           <div className="mb-5">
             <h2 className="font-display font-bold text-lg text-[var(--color-text-title)]">
@@ -228,34 +207,26 @@ export default async function DesignStudioPage({ searchParams }: Props) {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {FONTS_DISPLAY.map((font) => {
-              const isSelected = current.font_display === font.id
-              return (
-                <label
-                  key={font.id}
-                  className={`cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all ${
-                    isSelected
-                      ? 'border-[var(--color-brand-blue)] shadow-[var(--shadow-blue)] bg-blue-50/30'
-                      : 'border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="font_display"
-                    value={font.id}
-                    defaultChecked={isSelected}
-                    className="sr-only"
-                  />
-                  <p className="font-semibold text-sm text-[var(--color-text-title)]">
-                    {font.name}
-                    {isSelected && <span className="ml-2 text-[var(--color-brand-blue)]">✓</span>}
-                  </p>
-                  <p className="text-lg font-bold text-[var(--color-text-muted)] mt-1 truncate">
-                    {font.sample}
-                  </p>
-                </label>
-              )
-            })}
+            {FONTS_DISPLAY.map((font) => (
+              <label
+                key={font.id}
+                className="cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 transition-all border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40 [&:has(input:checked)]:border-[var(--color-brand-blue)] [&:has(input:checked)]:bg-blue-50/30 [&:has(input:checked)]:shadow-[0_0_0_3px_rgba(31,63,122,0.15)]"
+              >
+                <input
+                  type="radio"
+                  name="font_display"
+                  value={font.id}
+                  defaultChecked={current.font_display === font.id}
+                  className="sr-only"
+                />
+                <p className="font-semibold text-sm text-[var(--color-text-title)]">
+                  {font.name}
+                </p>
+                <p className="text-lg font-bold text-[var(--color-text-muted)] mt-1 truncate">
+                  {font.sample}
+                </p>
+              </label>
+            ))}
           </div>
         </section>
 
@@ -271,23 +242,18 @@ export default async function DesignStudioPage({ searchParams }: Props) {
           </div>
           <div className="grid grid-cols-3 gap-3">
             {TYPE_SCALES.map((scale) => {
-              const isSelected = current.type_scale === scale.id
               const sizeClass =
                 scale.id === 'compact' ? 'text-sm' : scale.id === 'generous' ? 'text-xl' : 'text-base'
               return (
                 <label
                   key={scale.id}
-                  className={`cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 text-center transition-all ${
-                    isSelected
-                      ? 'border-[var(--color-brand-blue)] shadow-[var(--shadow-blue)] bg-blue-50/30'
-                      : 'border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40'
-                  }`}
+                  className={`cursor-pointer rounded-[var(--radius-lg)] border-2 p-4 text-center transition-all border-[var(--color-border)] hover:border-[var(--color-brand-blue)]/40 [&:has(input:checked)]:border-[var(--color-brand-blue)] [&:has(input:checked)]:bg-blue-50/30 [&:has(input:checked)]:shadow-[0_0_0_3px_rgba(31,63,122,0.15)]`}
                 >
                   <input
                     type="radio"
                     name="type_scale"
                     value={scale.id}
-                    defaultChecked={isSelected}
+                    defaultChecked={current.type_scale === scale.id}
                     className="sr-only"
                   />
                   <p className={`font-bold text-[var(--color-text-title)] mb-1 ${sizeClass}`}>
@@ -295,7 +261,6 @@ export default async function DesignStudioPage({ searchParams }: Props) {
                   </p>
                   <p className="font-semibold text-sm text-[var(--color-text-title)]">
                     {scale.name}
-                    {isSelected && <span className="ml-1 text-[var(--color-brand-blue)]">✓</span>}
                   </p>
                   <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{scale.desc}</p>
                 </label>
@@ -304,17 +269,10 @@ export default async function DesignStudioPage({ searchParams }: Props) {
           </div>
         </section>
 
-        {/* Aviso sobre fontes externas */}
-        <div className="rounded-[var(--radius-md)] bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-          <strong>Atenção:</strong> as fontes Inter, Nunito, Open Sans, Oswald, Montserrat e
-          Playfair precisam ser importadas no projeto para funcionar corretamente. Gotham e DM Sans
-          já estão configuradas.
-        </div>
-
         {/* Botão salvar */}
         <div className="flex items-center justify-end gap-4 py-4 border-t border-[var(--color-border)]">
           <p className="text-xs text-[var(--color-text-muted)]">
-            As mudanças são aplicadas imediatamente ao site público.
+            As mudanças são aplicadas ao site público após salvar.
           </p>
           <button
             type="submit"
