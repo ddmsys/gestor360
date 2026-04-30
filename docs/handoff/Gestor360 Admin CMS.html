@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor360® — Admin CMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:    #1F3F7A;
+  --blue-h:  #163060;
+  --blue-s:  rgba(31,63,122,0.08);
+  --gold:    #D4A020;
+  --gold-s:  rgba(212,160,32,0.12);
+  --stone:   #8B8B8B;
+  --canvas:  #E8E6E1;
+  --canvas2: #F4F2ED;
+  --white:   #FFFFFF;
+  --ink:     #1A1A1A;
+  --text:    #5A5A5A;
+  --muted:   #8B8B8B;
+  --border:  #D8D5CF;
+  --border2: #EDEAE4;
+  --success: #2D7A4F;
+  --error:   #C0392B;
+  --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px;
+  --sh-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --sh-md: 0 4px 16px rgba(0,0,0,0.08);
+  --sh-lg: 0 8px 40px rgba(0,0,0,0.10);
+  --font: 'DM Sans', sans-serif;
+}
+
+html, body, #root { height: 100%; }
+body { font-family: var(--font); background: var(--canvas2); color: var(--ink); font-size: 14px; line-height: 1.5; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* Utils */
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useCallback } = React;
+
+/* ─── TOKENS ─── */
+const T = {
+  blue: '#1F3F7A', blueH: '#163060', blueS: 'rgba(31,63,122,0.08)',
+  gold: '#D4A020', goldS: 'rgba(212,160,32,0.12)',
+  stone: '#8B8B8B', canvas: '#E8E6E1', canvas2: '#F4F2ED',
+  white: '#FFFFFF', ink: '#1A1A1A', text: '#5A5A5A', muted: '#8B8B8B',
+  border: '#D8D5CF', border2: '#EDEAE4',
+  success: '#2D7A4F', error: '#C0392B',
+};
+
+/* ─── ICONS ─── */
+const Icon = ({ d, size = 16, color = 'currentColor', ...rest }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...rest}>
+    {Array.isArray(d) ? d.map((p,i) => typeof p === 'string' ? <path key={i} d={p}/> : p) : <path d={d}/>}
+  </svg>
+);
+
+const Icons = {
+  home:    'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z',
+  pages:   ['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z','M14 2v6h6','M16 13H8','M16 17H8','M10 9H8'],
+  blog:    ['M12 20h9','M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z'],
+  leads:   ['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2','M9 11a4 4 0 100-8 4 4 0 000 8z','M23 21v-2a4 4 0 00-3-3.87','M16 3.13a4 4 0 010 7.75'],
+  tools:   ['M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z'],
+  testi:   ['M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'],
+  design:  ['M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'],
+  eye:     ['M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z', <circle key="c" cx="12" cy="12" r="3"/>],
+  edit:    ['M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7','M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z'],
+  plus:    ['M12 5v14','M5 12h14'],
+  trash:   ['M3 6h18','M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2'],
+  drag:    ['M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01'],
+  chevU:   'M18 15l-6-6-6 6',
+  chevD:   'M6 9l6 6 6-6',
+  chevR:   'M9 18l6-6-6-6',
+  chevL:   'M15 18l-6-6 6-6',
+  close:   ['M18 6L6 18','M6 6l12 12'],
+  check:   'M20 6L9 17l-5-5',
+  copy:    ['M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2','M16 8h2a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-2'],
+  img:     ['M21 19a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2-3h4l2 3h4a2 2 0 012 2z', <circle key="c" cx="12" cy="13" r="4"/>],
+  link:    ['M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71','M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71'],
+  grid:    ['M3 3h7v7H3z','M14 3h7v7h-7z','M14 14h7v7h-7z','M3 14h7v7H3z'],
+  list:    ['M8 6h13','M8 12h13','M8 18h13','M3 6h.01','M3 12h.01','M3 18h.01'],
+  save:    ['M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z','M17 21v-8H7v8','M7 3v5h8'],
+  globe:   [<circle key="c" cx="12" cy="12" r="10"/>, 'M2 12h20','M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z'],
+  warn:    [<path key="p" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>, 'M12 9v4', <line key="l" x1="12" y1="17" x2="12.01" y2="17"/>],
+  logout:  ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4','M16 17l5-5-5-5','M21 12H9'],
+  toggle:  [<rect key="r" x="1" y="5" width="22" height="14" rx="7" ry="7"/>, <circle key="c" cx="16" cy="12" r="3" fill="currentColor" stroke="none"/>],
+};
+
+/* ─── PAGES DATA ─── */
+const PAGES_DATA = [
+  { id: 1, title: 'Home', slug: '/', status: 'published', sections: 6, updated: 'há 2h' },
+  { id: 2, title: 'Ferramentas', slug: '/ferramentas', status: 'published', sections: 4, updated: 'há 1 dia' },
+  { id: 3, title: 'O Método', slug: '/metodo', status: 'draft', sections: 3, updated: 'há 3 dias' },
+  { id: 4, title: 'Livro', slug: '/livro', status: 'published', sections: 5, updated: 'há 5 dias' },
+  { id: 5, title: 'Sobre os Autores', slug: '/sobre', status: 'published', sections: 2, updated: 'há 1 sem' },
+  { id: 6, title: 'Contato', slug: '/contato', status: 'draft', sections: 2, updated: 'há 2 sem' },
+  { id: 7, title: 'LP Palestra Mai/26', slug: '/lp/palestra-maio', status: 'draft', sections: 0, updated: 'agora' },
+];
+
+/* ─── SECTION TEMPLATES ─── */
+const SECTION_TYPES = [
+  {
+    type: 'hero', label: 'Hero', icon: '🎯',
+    desc: 'Seção principal com título, subtítulo e botão de ação',
+    variants: [
+      { label: 'Dark com animação 360', variant: 'dark', show_360_animation: true, align: 'center', title: 'O método que transforma quem lidera', subtitle: 'Para pequenos e médios empresários que querem liderar com consciência.' },
+      { label: 'Canvas claro', variant: 'canvas', align: 'left', title: 'Acesse as 31 ferramentas do método', subtitle: 'Cadastre-se e receba os PDFs por e-mail.' },
+      { label: 'Azul da marca', variant: 'blue', align: 'center', title: 'Gestor360®', subtitle: 'O método completo.' },
+    ]
+  },
+  {
+    type: 'cards', label: 'Cards', icon: '🃏',
+    desc: 'Grade de cards — benefícios, pilares, recursos',
+    variants: [
+      { label: '3 colunas canvas', columns: 3, bg: 'canvas', card_style: 'shadow', title: 'Os 3 pilares do método', items: [{icon:'⚙️',title:'Técnica',description:'As ferramentas de gestão.'},{icon:'🧠',title:'Neurociência',description:'Como sua mente interfere no negócio.'},{icon:'✨',title:'Propósito',description:'A dimensão que transforma gestores.'}] },
+      { label: '2 colunas branco', columns: 2, bg: 'white', card_style: 'bordered', title: 'Por que o Gestor360®?', items: [{icon:'📚',title:'31 ferramentas práticas',description:'Cada ferramenta aplicável amanhã.'},{icon:'🎯',title:'Método integrado',description:'Técnica, neurociência e propósito.'}] },
+      { label: '4 colunas flat', columns: 4, bg: 'white', card_style: 'flat', items: [{icon:'📊',title:'Diagnóstico',description:'Entenda onde está.'},{icon:'🗺️',title:'Planejamento',description:'Trace o caminho.'},{icon:'🚀',title:'Execução',description:'Aja com método.'},{icon:'🔄',title:'Revisão',description:'Aprenda e ajuste.'}] },
+    ]
+  },
+  {
+    type: 'text', label: 'Texto', icon: '📝',
+    desc: 'Bloco de texto — sobre, contexto, explicações',
+    variants: [
+      { label: 'Centralizado canvas', align: 'center', bg: 'canvas', badge: 'O Método', title: 'Gestão é técnica. Liderança é consciência.', body: 'O Gestor360® nasce da convicção de que o melhor líder é aquele que se conhece.' },
+      { label: 'À esquerda branco', align: 'left', bg: 'white', title: 'Sobre o livro', body: 'Um guia prático para líderes que querem resultados reais.' },
+    ]
+  },
+  {
+    type: 'form', label: 'Formulário', icon: '📋',
+    desc: 'Captura de leads — nome, e-mail, WhatsApp',
+    variants: [
+      { label: 'Fundo azul — captura lead', bg: 'blue', layout: 'centered', title: 'Acesse as ferramentas gratuitamente', submit_label: 'Quero as ferramentas', fields: [{field_key:'nome',label:'Seu nome',type:'text',required:true},{field_key:'email',label:'E-mail',type:'email',required:true},{field_key:'whatsapp',label:'WhatsApp',type:'tel',required:false}] },
+      { label: 'Fundo branco — contato', bg: 'white', layout: 'centered', title: 'Entre em contato', submit_label: 'Enviar mensagem', fields: [{field_key:'nome',label:'Nome',type:'text',required:true},{field_key:'email',label:'E-mail',type:'email',required:true},{field_key:'mensagem',label:'Mensagem',type:'textarea',required:true}] },
+    ]
+  },
+  {
+    type: 'cta', label: 'CTA', icon: '📣',
+    desc: 'Chamada para ação — botão de destaque',
+    variants: [
+      { label: 'Azul centralizado', variant: 'blue', align: 'center', title: 'Pronto para transformar sua liderança?', cta_label: 'Comprar o livro', cta_url: 'https://amazon.com.br' },
+      { label: 'Dourado', variant: 'gold', align: 'center', title: 'Participe do próximo treinamento', cta_label: 'Ver datas disponíveis' },
+      { label: 'Dark com imagem', variant: 'dark', align: 'left', title: 'O Método Gestor360® em suas mãos', cta_label: 'Pedir pelo site da DDM' },
+    ]
+  },
+  {
+    type: 'faq', label: 'FAQ', icon: '❓',
+    desc: 'Perguntas frequentes — accordion',
+    variants: [
+      { label: 'Canvas coluna simples', bg: 'canvas', title: 'Perguntas frequentes', items: [{question:'O livro é para qualquer empresa?',answer:'Sim, para PMEs brasileiras.'},{question:'Preciso do livro para as ferramentas?',answer:'Não. Ferramentas gratuitas via cadastro.'}] },
+    ]
+  },
+  {
+    type: 'depoimentos', label: 'Depoimentos', icon: '💬',
+    desc: 'Prova social — avaliações de leitores',
+    variants: [
+      { label: 'Grid 3 colunas — do Supabase', source: 'supabase', layout: 'grid', bg: 'canvas', title: 'O que dizem sobre o Gestor360®' },
+      { label: 'Carrossel — do Supabase', source: 'supabase', layout: 'carousel', bg: 'white' },
+    ]
+  },
+  {
+    type: 'capitulos', label: 'Capítulos', icon: '📖',
+    desc: 'Os 10 capítulos do método',
+    variants: [
+      { label: 'Grid canvas', bg: 'canvas', layout: 'grid' },
+      { label: 'Lista numerada', bg: 'white', layout: 'numbered-list' },
+    ]
+  },
+  {
+    type: 'autores', label: 'Autores', icon: '👤',
+    desc: 'Flávio Di Morais e Marcelo Caetano',
+    variants: [
+      { label: 'Lado a lado canvas', bg: 'canvas', layout: 'side-by-side' },
+      { label: 'Empilhado branco', bg: 'white', layout: 'stacked' },
+    ]
+  },
+  {
+    type: 'ferramentas', label: 'Ferramentas', icon: '🛠️',
+    desc: 'Biblioteca de ferramentas com filtro por capítulo',
+    variants: [
+      { label: 'Grid completo', layout: 'grid', mostrar_todos: true },
+      { label: 'Capítulo inicial', layout: 'grid', capitulo_inicial: 1 },
+    ]
+  },
+];
+
+/* ─── FIELD EDITORS ─── */
+
+const FieldGroup = ({ label, children }) => (
+  <div style={{ marginBottom: 20 }}>
+    <div style={{ fontSize: 11, fontWeight: 600, color: T.stone, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>{label}</div>
+    {children}
+  </div>
+);
+
+const TextInput = ({ label, value, onChange, placeholder, multiline }) => (
+  <div style={{ marginBottom: 12 }}>
+    {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: T.text, marginBottom: 4 }}>{label}</label>}
+    {multiline ? (
+      <textarea value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        style={{ width: '100%', minHeight: 80, padding: '8px 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 13, color: T.ink, resize: 'vertical', outline: 'none', background: T.white }}
+        onFocus={e => e.target.style.borderColor = T.blue}
+        onBlur={e => e.target.style.borderColor = 'var(--border)'}
+      />
+    ) : (
+      <input value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        style={{ width: '100%', height: 36, padding: '0 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 13, color: T.ink, outline: 'none', background: T.white }}
+        onFocus={e => e.target.style.borderColor = T.blue}
+        onBlur={e => e.target.style.borderColor = 'var(--border)'}
+      />
+    )}
+  </div>
+);
+
+const SegmentControl = ({ label, value, onChange, options }) => (
+  <div style={{ marginBottom: 12 }}>
+    {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: T.text, marginBottom: 6 }}>{label}</label>}
+    <div style={{ display: 'flex', gap: 4, background: T.canvas2, padding: 3, borderRadius: 8 }}>
+      {options.map(o => (
+        <button key={o.value} onClick={() => onChange(o.value)}
+          style={{ flex: 1, height: 30, border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)',
+            background: value === o.value ? T.white : 'transparent',
+            color: value === o.value ? T.blue : T.muted,
+            boxShadow: value === o.value ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+            transition: 'all 150ms ease'
+          }}>{o.label}</button>
+      ))}
+    </div>
+  </div>
+);
+
+const Toggle = ({ label, value, onChange }) => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, padding: '8px 0' }}>
+    <span style={{ fontSize: 13, color: T.text }}>{label}</span>
+    <div onClick={() => onChange(!value)} style={{ width: 40, height: 22, borderRadius: 11, background: value ? T.blue : T.border, cursor: 'pointer', position: 'relative', transition: 'background 200ms ease' }}>
+      <div style={{ position: 'absolute', top: 3, left: value ? 21 : 3, width: 16, height: 16, borderRadius: '50%', background: T.white, boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 200ms ease' }}/>
+    </div>
+  </div>
+);
+
+/* ─── HERO EDITOR ─── */
+const HeroEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  return (
+    <div>
+      <FieldGroup label="Conteúdo">
+        <TextInput label="Título *" value={content.title} onChange={v => set('title', v)} placeholder="O método que transforma quem lidera" />
+        <TextInput label="Subtítulo" value={content.subtitle} onChange={v => set('subtitle', v)} placeholder="Texto de apoio abaixo do título" multiline />
+      </FieldGroup>
+      <FieldGroup label="Botão principal">
+        <TextInput label="Texto do botão" value={content.cta_label} onChange={v => set('cta_label', v)} placeholder="Acessar ferramentas" />
+        <TextInput label="Link do botão" value={content.cta_url} onChange={v => set('cta_url', v)} placeholder="/ferramentas ou #form" />
+      </FieldGroup>
+      <FieldGroup label="Botão secundário">
+        <TextInput label="Texto" value={content.cta_secondary_label} onChange={v => set('cta_secondary_label', v)} placeholder="Conhecer o método" />
+        <TextInput label="Link" value={content.cta_secondary_url} onChange={v => set('cta_secondary_url', v)} placeholder="/metodo" />
+      </FieldGroup>
+      <FieldGroup label="Visual">
+        <SegmentControl label="Variante de cor" value={content.variant || 'dark'} onChange={v => set('variant', v)}
+          options={[{label:'Dark',value:'dark'},{label:'Canvas',value:'canvas'},{label:'Azul',value:'blue'}]} />
+        <SegmentControl label="Alinhamento" value={content.align || 'center'} onChange={v => set('align', v)}
+          options={[{label:'◀ Esq',value:'left'},{label:'◼ Centro',value:'center'},{label:'Direita ▶',value:'right'}]} />
+        <Toggle label="Animação 3·6·0" value={content.show_360_animation || false} onChange={v => set('show_360_animation', v)} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── CTA EDITOR ─── */
+const CTAEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  return (
+    <div>
+      <FieldGroup label="Conteúdo">
+        <TextInput label="Título *" value={content.title} onChange={v => set('title', v)} placeholder="Pronto para transformar sua liderança?" />
+        <TextInput label="Subtítulo" value={content.subtitle} onChange={v => set('subtitle', v)} placeholder="Texto de apoio (opcional)" />
+      </FieldGroup>
+      <FieldGroup label="Botão">
+        <TextInput label="Texto" value={content.cta_label} onChange={v => set('cta_label', v)} placeholder="Comprar o livro" />
+        <TextInput label="Link" value={content.cta_url} onChange={v => set('cta_url', v)} placeholder="https://..." />
+      </FieldGroup>
+      <FieldGroup label="Visual">
+        <SegmentControl label="Variante" value={content.variant || 'blue'} onChange={v => set('variant', v)}
+          options={[{label:'Azul',value:'blue'},{label:'Dourado',value:'gold'},{label:'Dark',value:'dark'},{label:'Canvas',value:'canvas'}]} />
+        <SegmentControl label="Alinhamento" value={content.align || 'center'} onChange={v => set('align', v)}
+          options={[{label:'◀ Esq',value:'left'},{label:'◼ Centro',value:'center'}]} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── TEXT EDITOR ─── */
+const TextEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  return (
+    <div>
+      <FieldGroup label="Conteúdo">
+        <TextInput label="Badge (eyebrow)" value={content.badge} onChange={v => set('badge', v)} placeholder="O Método" />
+        <TextInput label="Título" value={content.title} onChange={v => set('title', v)} placeholder="Gestão é técnica. Liderança é consciência." />
+        <TextInput label="Subtítulo" value={content.subtitle} onChange={v => set('subtitle', v)} placeholder="Texto de apoio" />
+        <TextInput label="Corpo *" value={content.body} onChange={v => set('body', v)} placeholder="Texto principal (Markdown suportado: **negrito**, _itálico_)" multiline />
+      </FieldGroup>
+      <FieldGroup label="Visual">
+        <SegmentControl label="Fundo" value={content.bg || 'white'} onChange={v => set('bg', v)}
+          options={[{label:'Branco',value:'white'},{label:'Canvas',value:'canvas'},{label:'Dark',value:'ink'}]} />
+        <SegmentControl label="Alinhamento" value={content.align || 'left'} onChange={v => set('align', v)}
+          options={[{label:'◀ Esq',value:'left'},{label:'◼ Centro',value:'center'},{label:'Direita ▶',value:'right'}]} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── CARDS EDITOR ─── */
+const CardsEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  const items = content.items || [];
+  const updateItem = (i, k, v) => {
+    const next = [...items]; next[i] = { ...next[i], [k]: v }; set('items', next);
+  };
+  const addItem = () => set('items', [...items, { icon: '', title: 'Novo card', description: '' }]);
+  const removeItem = i => set('items', items.filter((_, j) => j !== i));
+
+  return (
+    <div>
+      <FieldGroup label="Cabeçalho">
+        <TextInput label="Título da seção" value={content.title} onChange={v => set('title', v)} placeholder="Três dimensões. Um método completo." />
+        <TextInput label="Subtítulo" value={content.subtitle} onChange={v => set('subtitle', v)} placeholder="Texto de apoio" />
+      </FieldGroup>
+      <FieldGroup label="Cards">
+        {items.map((item, i) => (
+          <div key={i} style={{ background: T.canvas2, border: `1px solid var(--border)`, borderRadius: 8, padding: 12, marginBottom: 8, position: 'relative' }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+              <input value={item.icon || ''} onChange={e => updateItem(i,'icon',e.target.value)}
+                placeholder="🎯" style={{ width: 44, height: 34, textAlign: 'center', border: `1px solid var(--border)`, borderRadius: 6, fontSize: 16, background: T.white, outline: 'none' }} />
+              <input value={item.title} onChange={e => updateItem(i,'title',e.target.value)}
+                placeholder="Título do card" style={{ flex: 1, height: 34, padding: '0 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 13, outline: 'none', background: T.white }} />
+              <button onClick={() => removeItem(i)} style={{ width: 34, height: 34, border: 'none', borderRadius: 6, background: 'transparent', cursor: 'pointer', color: T.muted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon d={Icons.trash} size={14} />
+              </button>
+            </div>
+            <textarea value={item.description} onChange={e => updateItem(i,'description',e.target.value)}
+              placeholder="Descrição do card" rows={2}
+              style={{ width: '100%', padding: '6px 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 12, resize: 'none', outline: 'none', background: T.white }} />
+          </div>
+        ))}
+        <button onClick={addItem} style={{ width: '100%', height: 36, border: `1px dashed var(--border)`, borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 13, color: T.blue, fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <Icon d={Icons.plus} size={14} /> Adicionar card
+        </button>
+      </FieldGroup>
+      <FieldGroup label="Layout">
+        <SegmentControl label="Colunas" value={String(content.columns || 3)} onChange={v => set('columns', Number(v))}
+          options={[{label:'2',value:'2'},{label:'3',value:'3'},{label:'4',value:'4'}]} />
+        <SegmentControl label="Fundo" value={content.bg || 'white'} onChange={v => set('bg', v)}
+          options={[{label:'Branco',value:'white'},{label:'Canvas',value:'canvas'},{label:'Dark',value:'ink'}]} />
+        <SegmentControl label="Estilo" value={content.card_style || 'shadow'} onChange={v => set('card_style', v)}
+          options={[{label:'Sombra',value:'shadow'},{label:'Borda',value:'bordered'},{label:'Flat',value:'flat'}]} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── FORM EDITOR ─── */
+const FormEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  const fields = content.fields || [];
+  const updateField = (i, k, v) => { const n = [...fields]; n[i] = { ...n[i], [k]: v }; set('fields', n); };
+  const addField = () => set('fields', [...fields, { field_key: 'campo_' + (fields.length+1), label: 'Novo campo', type: 'text', required: false }]);
+  const removeField = i => set('fields', fields.filter((_, j) => j !== i));
+
+  return (
+    <div>
+      <FieldGroup label="Cabeçalho">
+        <TextInput label="Título" value={content.title} onChange={v => set('title', v)} placeholder="Acesse as ferramentas" />
+        <TextInput label="Subtítulo" value={content.subtitle} onChange={v => set('subtitle', v)} placeholder="Preencha para receber por e-mail" />
+      </FieldGroup>
+      <FieldGroup label="Campos do formulário">
+        {fields.map((f, i) => (
+          <div key={i} style={{ background: T.canvas2, border: `1px solid var(--border)`, borderRadius: 8, padding: 10, marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: f.required ? T.blue : T.border, flexShrink: 0 }} title={f.required ? 'Obrigatório' : 'Opcional'} />
+              <input value={f.label} onChange={e => updateField(i,'label',e.target.value)}
+                style={{ flex: 1, height: 30, padding: '0 8px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 12, outline: 'none', background: T.white, fontWeight: 500 }} />
+              <select value={f.type} onChange={e => updateField(i,'type',e.target.value)}
+                style={{ height: 30, padding: '0 8px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 11, color: T.text, background: T.white, outline: 'none' }}>
+                {['text','email','tel','textarea','select','checkbox'].map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <button onClick={() => removeField(i)} style={{ width: 28, height: 28, border: 'none', background: 'transparent', cursor: 'pointer', color: T.muted }}>
+                <Icon d={Icons.close} size={12} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input value={f.field_key} onChange={e => updateField(i,'field_key',e.target.value)}
+                style={{ width: 120, height: 26, padding: '0 8px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'monospace', fontSize: 11, color: T.stone, background: '#fafaf8', outline: 'none' }} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: T.text, cursor: 'pointer', userSelect: 'none' }}>
+                <input type="checkbox" checked={f.required} onChange={e => updateField(i,'required',e.target.checked)} style={{ accentColor: T.blue }} />
+                Obrigatório
+              </label>
+            </div>
+          </div>
+        ))}
+        <button onClick={addField} style={{ width: '100%', height: 34, border: `1px dashed var(--border)`, borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 12, color: T.blue, fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <Icon d={Icons.plus} size={13} /> Adicionar campo
+        </button>
+      </FieldGroup>
+      <FieldGroup label="Submit">
+        <TextInput label="Texto do botão" value={content.submit_label} onChange={v => set('submit_label', v)} placeholder="Quero as ferramentas" />
+        <TextInput label="Mensagem de sucesso" value={content.success_title} onChange={v => set('success_title', v)} placeholder="Pronto! Verifique seu e-mail." />
+      </FieldGroup>
+      <FieldGroup label="Visual">
+        <SegmentControl label="Fundo" value={content.bg || 'blue'} onChange={v => set('bg', v)}
+          options={[{label:'Azul',value:'blue'},{label:'Branco',value:'white'},{label:'Canvas',value:'canvas'}]} />
+        <SegmentControl label="Layout" value={content.layout || 'centered'} onChange={v => set('layout', v)}
+          options={[{label:'Centralizado',value:'centered'},{label:'Lado a lado',value:'side-by-side'}]} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── FAQ EDITOR ─── */
+const FAQEditor = ({ content, onChange }) => {
+  const set = (k, v) => onChange({ ...content, [k]: v });
+  const items = content.items || [];
+  const updateItem = (i, k, v) => { const n = [...items]; n[i] = { ...n[i], [k]: v }; set('items', n); };
+  const addItem = () => set('items', [...items, { question: 'Nova pergunta?', answer: 'Resposta aqui.' }]);
+  const removeItem = i => set('items', items.filter((_, j) => j !== i));
+  return (
+    <div>
+      <FieldGroup label="Cabeçalho">
+        <TextInput label="Título" value={content.title} onChange={v => set('title', v)} placeholder="Perguntas frequentes" />
+      </FieldGroup>
+      <FieldGroup label="Perguntas e respostas">
+        {items.map((item, i) => (
+          <div key={i} style={{ border: `1px solid var(--border)`, borderRadius: 8, padding: 10, marginBottom: 8, background: T.white }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+              <input value={item.question} onChange={e => updateItem(i,'question',e.target.value)}
+                style={{ flex: 1, height: 32, padding: '0 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 12, fontWeight: 600, outline: 'none' }} placeholder="Pergunta?" />
+              <button onClick={() => removeItem(i)} style={{ width: 28, height: 28, border: 'none', background: 'transparent', cursor: 'pointer', color: T.muted }}>
+                <Icon d={Icons.close} size={12} />
+              </button>
+            </div>
+            <textarea value={item.answer} onChange={e => updateItem(i,'answer',e.target.value)}
+              rows={2} placeholder="Resposta (Markdown suportado)"
+              style={{ width: '100%', padding: '6px 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 12, resize: 'none', outline: 'none' }} />
+          </div>
+        ))}
+        <button onClick={addItem} style={{ width: '100%', height: 34, border: `1px dashed var(--border)`, borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 12, color: T.blue, fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <Icon d={Icons.plus} size={13} /> Adicionar pergunta
+        </button>
+      </FieldGroup>
+      <FieldGroup label="Visual">
+        <SegmentControl label="Fundo" value={content.bg || 'white'} onChange={v => set('bg', v)}
+          options={[{label:'Branco',value:'white'},{label:'Canvas',value:'canvas'}]} />
+      </FieldGroup>
+    </div>
+  );
+};
+
+/* ─── GENERIC EDITOR ─── */
+const GenericEditor = ({ type }) => (
+  <div style={{ padding: '24px 16px', textAlign: 'center', color: T.muted }}>
+    <div style={{ fontSize: 32, marginBottom: 12 }}>{SECTION_TYPES.find(s => s.type === type)?.icon}</div>
+    <div style={{ fontSize: 13, fontWeight: 500, color: T.text, marginBottom: 6 }}>Editor de {type}</div>
+    <div style={{ fontSize: 12 }}>Os campos deste tipo são configurados automaticamente a partir do banco de dados.</div>
+  </div>
+);
+
+/* ─── STYLE EDITOR ─── */
+
+const COLOR_PALETTES = [
+  { label: 'Brand', colors: ['#1F3F7A','#D4A020','#8B8B8B','#E8E6E1','#1A1A1A','#FFFFFF'] },
+  { label: 'Quente', colors: ['#7C2D12','#B45309','#D97706','#FEF3C7','#FFF7ED','#FFFFFF'] },
+  { label: 'Frio', colors: ['#1E3A5F','#1D4ED8','#60A5FA','#DBEAFE','#EFF6FF','#FFFFFF'] },
+  { label: 'Terra', colors: ['#44403C','#78716C','#A8A29E','#D6D3D1','#F5F5F4','#FAFAF9'] },
+  { label: 'Verde', colors: ['#14532D','#166534','#15803D','#BBF7D0','#DCFCE7','#F0FDF4'] },
+];
+
+const FONT_PAIRS = [
+  { label: 'Gotham + DM Sans', display: 'gotham, sans-serif', body: "'DM Sans', sans-serif", preview: 'Aa' },
+  { label: 'Playfair + DM Sans', display: "'Playfair Display', serif", body: "'DM Sans', sans-serif", preview: 'Aa' },
+  { label: 'Montserrat + Inter', display: "'Montserrat', sans-serif", body: "'Inter', sans-serif", preview: 'Aa' },
+  { label: 'Cormorant + DM Sans', display: "'Cormorant Garamond', serif", body: "'DM Sans', sans-serif", preview: 'Aa' },
+  { label: 'Space Grotesk + Inter', display: "'Space Grotesk', sans-serif", body: "'Inter', sans-serif", preview: 'Aa' },
+];
+
+const SHADOW_PRESETS = [
+  { label: 'Nenhuma', value: 'none' },
+  { label: 'Suave', value: '0 2px 12px rgba(0,0,0,0.06)' },
+  { label: 'Média', value: '0 4px 24px rgba(0,0,0,0.10)' },
+  { label: 'Forte', value: '0 8px 40px rgba(0,0,0,0.16)' },
+  { label: 'Azul', value: '0 4px 24px rgba(31,63,122,0.25)' },
+  { label: 'Dourada', value: '0 4px 24px rgba(212,160,32,0.30)' },
+];
+
+const GRADIENT_PRESETS = [
+  { label: 'Nenhum', value: '' },
+  { label: '360 Brand', value: 'linear-gradient(135deg, #1F3F7A 0%, #1A1A1A 100%)' },
+  { label: 'Dourado', value: 'linear-gradient(135deg, #D4A020 0%, #7C2D12 100%)' },
+  { label: 'Azul frio', value: 'linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 100%)' },
+  { label: 'Canvas', value: 'linear-gradient(180deg, #E8E6E1 0%, #F4F2ED 100%)' },
+  { label: 'Escuro', value: 'linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%)' },
+];
+
+const BORDER_RADIUS_PRESETS = [
+  { label: 'Zero', value: '0px' },
+  { label: 'Leve', value: '8px' },
+  { label: 'Médio', value: '16px' },
+  { label: 'Grande', value: '24px' },
+  { label: 'Pill', value: '999px' },
+];
+
+const SPACING_OPTIONS = [
+  { label: 'XS', value: '32px' },
+  { label: 'SM', value: '48px' },
+  { label: 'MD', value: '64px' },
+  { label: 'LG', value: '96px' },
+  { label: 'XL', value: '128px' },
+];
+
+const StyleColorPicker = ({ label, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState(value || '#1F3F7A');
+  return (
+    <div style={{ marginBottom: 14 }}>
+      {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: T.text, marginBottom: 6 }}>{label}</label>}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {COLOR_PALETTES.map(pal => (
+          <div key={pal.label}>
+            <div style={{ fontSize: 10, color: T.muted, marginBottom: 4, letterSpacing: '0.06em' }}>{pal.label}</div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {pal.colors.map(c => (
+                <button key={c} onClick={() => onChange(c)} title={c}
+                  style={{ width: 28, height: 28, borderRadius: 6, border: value === c ? `2px solid ${T.blue}` : `1.5px solid rgba(0,0,0,0.12)`, background: c, cursor: 'pointer', boxShadow: value === c ? `0 0 0 2px ${T.blueS}` : 'none', transition: 'all 100ms ease', flexShrink: 0 }} />
+              ))}
+            </div>
+          </div>
+        ))}
+        <div>
+          <div style={{ fontSize: 10, color: T.muted, marginBottom: 4, letterSpacing: '0.06em' }}>Cor personalizada</div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <input type="color" value={custom} onChange={e => { setCustom(e.target.value); onChange(e.target.value); }}
+              style={{ width: 36, height: 28, border: `1px solid var(--border)`, borderRadius: 6, padding: 2, cursor: 'pointer', background: 'none' }} />
+            <input value={custom} onChange={e => { setCustom(e.target.value); if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) onChange(e.target.value); }}
+              style={{ flex: 1, height: 28, padding: '0 8px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'monospace', fontSize: 12, outline: 'none' }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StyleEditor = ({ section, onChange }) => {
+  const style = section.style || {};
+  const set = (k, v) => onChange({ ...section, style: { ...style, [k]: v } });
+  const [activeTab, setActiveTab] = useState('fundo');
+
+  const STYLE_TABS = [
+    { id: 'fundo', label: 'Fundo' },
+    { id: 'tipo', label: 'Tipo' },
+    { id: 'espaco', label: 'Espaço' },
+    { id: 'efeitos', label: 'Efeitos' },
+  ];
+
+  return (
+    <div>
+      {/* Sub-tabs */}
+      <div style={{ display: 'flex', gap: 2, background: T.canvas2, padding: 3, borderRadius: 8, marginBottom: 16 }}>
+        {STYLE_TABS.map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            style={{ flex: 1, height: 28, border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)',
+              background: activeTab === t.id ? T.white : 'transparent',
+              color: activeTab === t.id ? T.blue : T.muted,
+              boxShadow: activeTab === t.id ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+              transition: 'all 150ms ease' }}>{t.label}</button>
+        ))}
+      </div>
+
+      {/* FUNDO */}
+      {activeTab === 'fundo' && (
+        <div>
+          <FieldGroup label="Cor sólida de fundo">
+            <StyleColorPicker value={style.bgColor} onChange={v => set('bgColor', v)} />
+          </FieldGroup>
+          <FieldGroup label="Gradiente">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {GRADIENT_PRESETS.map(g => (
+                <button key={g.label} onClick={() => set('gradient', g.value)}
+                  style={{ height: g.value ? 40 : 32, borderRadius: 8, border: `1.5px solid ${style.gradient === g.value ? T.blue : 'var(--border)'}`, cursor: 'pointer', background: g.value || T.canvas2, display: 'flex', alignItems: 'center', padding: '0 10px', gap: 8, transition: 'all 100ms ease' }}>
+                  {g.value && <div style={{ width: 20, height: 20, borderRadius: 4, background: g.value, flexShrink: 0 }} />}
+                  <span style={{ fontSize: 12, color: g.value ? T.white : T.text, fontWeight: 500, textShadow: g.value ? '0 1px 2px rgba(0,0,0,0.4)' : 'none' }}>{g.label}</span>
+                  {style.gradient === g.value && <Icon d={Icons.check} size={12} color={g.value ? T.white : T.blue} style={{ marginLeft: 'auto' }} />}
+                </button>
+              ))}
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Opacidade do fundo">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input type="range" min={10} max={100} value={style.bgOpacity ?? 100} onChange={e => set('bgOpacity', Number(e.target.value))}
+                style={{ flex: 1, accentColor: T.blue }} />
+              <span style={{ fontSize: 12, color: T.text, width: 36, textAlign: 'right' }}>{style.bgOpacity ?? 100}%</span>
+            </div>
+          </FieldGroup>
+        </div>
+      )}
+
+      {/* TIPOGRAFIA */}
+      {activeTab === 'tipo' && (
+        <div>
+          <FieldGroup label="Par de fontes">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {FONT_PAIRS.map(fp => (
+                <button key={fp.label} onClick={() => set('fontPair', fp.label)}
+                  style={{ padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${style.fontPair === fp.label ? T.blue : 'var(--border)'}`, cursor: 'pointer', background: style.fontPair === fp.label ? T.blueS : T.white, display: 'flex', alignItems: 'center', gap: 10, transition: 'all 100ms ease', textAlign: 'left' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 6, background: T.canvas2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: fp.display, fontSize: 18, fontWeight: 700, color: T.ink, flexShrink: 0 }}>Aa</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: style.fontPair === fp.label ? T.blue : T.ink }}>{fp.label}</div>
+                    <div style={{ fontSize: 10, color: T.muted }}>Display + Corpo</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Escala de título">
+            <SegmentControl value={style.titleScale || 'md'} onChange={v => set('titleScale', v)}
+              options={[{label:'XS',value:'xs'},{label:'SM',value:'sm'},{label:'MD',value:'md'},{label:'LG',value:'lg'},{label:'XL',value:'xl'}]} />
+          </FieldGroup>
+          <FieldGroup label="Peso do título">
+            <SegmentControl value={style.titleWeight || '700'} onChange={v => set('titleWeight', v)}
+              options={[{label:'Normal',value:'400'},{label:'Médio',value:'500'},{label:'Semi',value:'600'},{label:'Bold',value:'700'},{label:'Black',value:'900'}]} />
+          </FieldGroup>
+          <FieldGroup label="Cor do título">
+            <StyleColorPicker value={style.titleColor} onChange={v => set('titleColor', v)} />
+          </FieldGroup>
+          <FieldGroup label="Cor do texto">
+            <StyleColorPicker value={style.textColor} onChange={v => set('textColor', v)} />
+          </FieldGroup>
+          <FieldGroup label="Espaçamento entre letras">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input type="range" min={-2} max={12} step={0.5} value={style.letterSpacing ?? 0} onChange={e => set('letterSpacing', Number(e.target.value))}
+                style={{ flex: 1, accentColor: T.blue }} />
+              <span style={{ fontSize: 12, color: T.text, width: 40, textAlign: 'right' }}>{style.letterSpacing ?? 0}px</span>
+            </div>
+          </FieldGroup>
+        </div>
+      )}
+
+      {/* ESPAÇAMENTO */}
+      {activeTab === 'espaco' && (
+        <div>
+          <FieldGroup label="Padding vertical da seção">
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {SPACING_OPTIONS.map(s => (
+                <button key={s.label} onClick={() => set('paddingY', s.value)}
+                  style={{ height: 32, padding: '0 12px', borderRadius: 6, border: `1.5px solid ${style.paddingY === s.value ? T.blue : 'var(--border)'}`, background: style.paddingY === s.value ? T.blueS : T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 12, fontWeight: 500, color: style.paddingY === s.value ? T.blue : T.text, transition: 'all 100ms ease' }}>
+                  {s.label} <span style={{ fontSize: 10, color: T.muted }}>({s.value})</span>
+                </button>
+              ))}
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Padding horizontal">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input type="range" min={0} max={120} step={8} value={style.paddingX ?? 24} onChange={e => set('paddingX', Number(e.target.value))}
+                style={{ flex: 1, accentColor: T.blue }} />
+              <span style={{ fontSize: 12, color: T.text, width: 40, textAlign: 'right' }}>{style.paddingX ?? 24}px</span>
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Largura máxima do conteúdo">
+            <SegmentControl value={style.maxWidth || 'xl'} onChange={v => set('maxWidth', v)}
+              options={[{label:'SM',value:'sm'},{label:'MD',value:'md'},{label:'LG',value:'lg'},{label:'XL',value:'xl'},{label:'Full',value:'full'}]} />
+          </FieldGroup>
+          <FieldGroup label="Arredondamento das bordas">
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {BORDER_RADIUS_PRESETS.map(r => (
+                <button key={r.label} onClick={() => set('borderRadius', r.value)}
+                  style={{ height: 32, padding: '0 12px', borderRadius: 6, border: `1.5px solid ${style.borderRadius === r.value ? T.blue : 'var(--border)'}`, background: style.borderRadius === r.value ? T.blueS : T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 12, color: style.borderRadius === r.value ? T.blue : T.text, transition: 'all 100ms ease' }}>
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Divisor entre seções">
+            <SegmentControl value={style.divider || 'none'} onChange={v => set('divider', v)}
+              options={[{label:'Nenhum',value:'none'},{label:'Linha',value:'line'},{label:'Onda',value:'wave'},{label:'Diagonal',value:'diagonal'}]} />
+          </FieldGroup>
+        </div>
+      )}
+
+      {/* EFEITOS */}
+      {activeTab === 'efeitos' && (
+        <div>
+          <FieldGroup label="Sombra da seção">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {SHADOW_PRESETS.map(s => (
+                <button key={s.label} onClick={() => set('shadow', s.value)}
+                  style={{ padding: '10px 12px', borderRadius: 8, border: `1.5px solid ${style.shadow === s.value ? T.blue : 'var(--border)'}`, background: T.white, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'all 100ms ease', boxShadow: s.value !== 'none' ? s.value : 'none' }}>
+                  <div style={{ width: 28, height: 20, borderRadius: 4, background: T.canvas2, boxShadow: s.value !== 'none' ? s.value : 'none', border: `1px solid var(--border2)`, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: style.shadow === s.value ? T.blue : T.text, fontWeight: style.shadow === s.value ? 600 : 400 }}>{s.label}</span>
+                  {style.shadow === s.value && <Icon d={Icons.check} size={12} color={T.blue} />}
+                </button>
+              ))}
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Overlay sobre imagem de fundo">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input type="range" min={0} max={80} value={style.overlayOpacity ?? 0} onChange={e => set('overlayOpacity', Number(e.target.value))}
+                style={{ flex: 1, accentColor: T.blue }} />
+              <span style={{ fontSize: 12, color: T.text, width: 36, textAlign: 'right' }}>{style.overlayOpacity ?? 0}%</span>
+            </div>
+          </FieldGroup>
+          <FieldGroup label="Efeitos especiais">
+            <Toggle label="Blur de fundo (glassmorphism)" value={style.blur || false} onChange={v => set('blur', v)} />
+            <Toggle label="Borda da seção" value={style.border || false} onChange={v => set('border', v)} />
+            <Toggle label="Animação de entrada" value={style.animation || false} onChange={v => set('animation', v)} />
+          </FieldGroup>
+          <FieldGroup label="Cor da borda">
+            {style.border && <StyleColorPicker value={style.borderColor} onChange={v => set('borderColor', v)} />}
+            {!style.border && <div style={{ fontSize: 12, color: T.muted, padding: '8px 0' }}>Ative "Borda da seção" acima.</div>}
+          </FieldGroup>
+          <FieldGroup label="Intensidade do blur">
+            {style.blur && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <input type="range" min={2} max={32} value={style.blurAmount ?? 8} onChange={e => set('blurAmount', Number(e.target.value))}
+                  style={{ flex: 1, accentColor: T.blue }} />
+                <span style={{ fontSize: 12, color: T.text, width: 40, textAlign: 'right' }}>{style.blurAmount ?? 8}px</span>
+              </div>
+            )}
+            {!style.blur && <div style={{ fontSize: 12, color: T.muted, padding: '8px 0' }}>Ative o glassmorphism acima.</div>}
+          </FieldGroup>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── SECTION EDITOR DISPATCH ─── */
+const SectionEditor = ({ section, onChange }) => {
+  const { type, content } = section;
+  const map = { hero: HeroEditor, cta: CTAEditor, text: TextEditor, cards: CardsEditor, form: FormEditor, faq: FAQEditor };
+  const Comp = map[type];
+  return Comp ? <Comp content={content} onChange={c => onChange({ ...section, content: c })} /> : <GenericEditor type={type} />;
+};
+
+/* ─── SECTION VISUAL PREVIEW ─── */
+const SectionPreview = ({ section }) => {
+  const meta = SECTION_TYPES.find(s => s.type === section.type);
+  const bgColors = { white: T.white, canvas: T.canvas, blue: T.blue, ink: T.ink, dark: T.ink };
+  const bg = bgColors[section.content?.variant] || bgColors[section.content?.bg] || T.white;
+  const light = bg === T.white || bg === T.canvas;
+
+  return (
+    <div style={{ background: bg, borderRadius: 6, padding: '16px 20px', minHeight: 72, position: 'relative', overflow: 'hidden' }}>
+      {/* Texture hint */}
+      <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', opacity: 0.08, fontSize: 48 }}>{meta?.icon}</div>
+      <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: light ? T.muted : 'rgba(255,255,255,0.5)', marginBottom: 4 }}>{meta?.label}</div>
+      {section.content?.title && (
+        <div style={{ fontSize: 14, fontWeight: 700, color: light ? T.ink : T.white, marginBottom: 2, maxWidth: '80%' }}>{section.content.title}</div>
+      )}
+      {section.content?.subtitle && (
+        <div style={{ fontSize: 11, color: light ? T.text : 'rgba(255,255,255,0.7)', maxWidth: '70%' }} className="truncate">{section.content.subtitle}</div>
+      )}
+      {section.content?.body && !section.content?.title && (
+        <div style={{ fontSize: 11, color: light ? T.text : 'rgba(255,255,255,0.7)' }} className="truncate">{section.content.body}</div>
+      )}
+      {section.content?.fields && (
+        <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+          {section.content.fields.map((f, i) => (
+            <span key={i} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 99, background: light ? T.canvas2 : 'rgba(255,255,255,0.15)', color: light ? T.text : 'rgba(255,255,255,0.8)' }}>{f.label}</span>
+          ))}
+        </div>
+      )}
+      {section.content?.items && (
+        <div style={{ fontSize: 11, color: light ? T.stone : 'rgba(255,255,255,0.6)', marginTop: 4 }}>{section.content.items.length} {section.type === 'faq' ? 'perguntas' : 'itens'}</div>
+      )}
+    </div>
+  );
+};
+
+/* ─── TEMPLATE PICKER MODAL ─── */
+const TemplatePicker = ({ onSelect, onClose }) => {
+  const [activeType, setActiveType] = useState(SECTION_TYPES[0].type);
+  const meta = SECTION_TYPES.find(s => s.type === activeType);
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(26,26,26,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={onClose}>
+      <div style={{ background: T.white, borderRadius: 16, width: '100%', maxWidth: 760, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div style={{ padding: '20px 24px', borderBottom: `1px solid var(--border2)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: T.ink }}>Adicionar seção</div>
+            <div style={{ fontSize: 12, color: T.muted }}>Escolha um tipo e selecione um template</div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: T.canvas2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.text }}>
+            <Icon d={Icons.close} size={14} />
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          {/* Type sidebar */}
+          <div style={{ width: 180, borderRight: `1px solid var(--border2)`, padding: '12px 8px', overflowY: 'auto', flexShrink: 0 }}>
+            {SECTION_TYPES.map(s => (
+              <button key={s.type} onClick={() => setActiveType(s.type)}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2, fontFamily: 'var(--font)', transition: 'all 120ms ease',
+                  background: activeType === s.type ? T.blueS : 'transparent',
+                  color: activeType === s.type ? T.blue : T.text,
+                  fontWeight: activeType === s.type ? 600 : 400, fontSize: 13 }}>
+                <span style={{ fontSize: 16 }}>{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Variants */}
+          <div style={{ flex: 1, padding: '16px 20px', overflowY: 'auto' }}>
+            <div style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>{meta?.desc}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {meta?.variants.map((v, i) => {
+                const bgColors = { white: T.white, canvas: T.canvas, blue: T.blue, dark: T.ink, ink: T.ink };
+                const varBg = bgColors[v.variant] || bgColors[v.bg] || T.white;
+                const light = varBg === T.white || varBg === T.canvas;
+                return (
+                  <button key={i} onClick={() => onSelect(meta.type, v)}
+                    style={{ border: `1.5px solid var(--border)`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', textAlign: 'left', background: T.white, transition: 'all 150ms ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = T.blue; e.currentTarget.style.boxShadow = `0 0 0 3px ${T.blueS}`; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}>
+                    {/* Mini preview */}
+                    <div style={{ background: varBg, padding: '14px 18px', minHeight: 64 }}>
+                      {v.title && <div style={{ fontSize: 13, fontWeight: 700, color: light ? T.ink : T.white, marginBottom: 2 }}>{v.title}</div>}
+                      {v.subtitle && <div style={{ fontSize: 11, color: light ? T.text : 'rgba(255,255,255,0.7)' }}>{v.subtitle}</div>}
+                      {v.items && <div style={{ fontSize: 11, color: light ? T.stone : 'rgba(255,255,255,0.6)', marginTop: 4 }}>{v.items.length} itens</div>}
+                      {v.fields && <div style={{ fontSize: 11, color: light ? T.stone : 'rgba(255,255,255,0.6)', marginTop: 4 }}>{v.fields.length} campos</div>}
+                    </div>
+                    <div style={{ padding: '8px 14px', borderTop: `1px solid var(--border2)`, fontSize: 11, color: T.stone, fontWeight: 500 }}>{v.label}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── RIGHT PANEL ─── */
+const RightPanel = ({ selected, updateSection, setSelectedId }) => {
+  const [tab, setTab] = useState('conteudo');
+  const meta = SECTION_TYPES.find(s => s.type === selected.type);
+  const style = selected.style || {};
+
+  // Live style preview tokens
+  const previewStyle = {
+    '--section-bg': style.gradient || style.bgColor || '',
+    '--section-title-color': style.titleColor || '',
+    '--section-text-color': style.textColor || '',
+  };
+
+  return (
+    <div style={{ width: 340, background: T.white, borderLeft: `1px solid var(--border2)`, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      {/* Header */}
+      <div style={{ padding: '12px 14px', borderBottom: `1px solid var(--border2)`, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 18 }}>{meta?.icon}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{meta?.label}</div>
+              <div style={{ fontSize: 10, color: T.muted }}>Editando seção</div>
+            </div>
+          </div>
+          <button onClick={() => setSelectedId(null)} style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: T.canvas2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.text }}>
+            <Icon d={Icons.close} size={12} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', background: T.canvas2, padding: 3, borderRadius: 8, gap: 2 }}>
+          {[{id:'conteudo',label:'✏️ Conteúdo'},{id:'estilo',label:'🎨 Estilo'}].map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              style={{ flex: 1, height: 30, border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font)', transition: 'all 150ms ease',
+                background: tab === t.id ? T.white : 'transparent',
+                color: tab === t.id ? T.blue : T.muted,
+                boxShadow: tab === t.id ? '0 1px 3px rgba(0,0,0,0.10)' : 'none' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Style badge strip */}
+      {tab === 'estilo' && Object.keys(style).length > 0 && (
+        <div style={{ padding: '8px 14px', borderBottom: `1px solid var(--border2)`, display: 'flex', gap: 4, flexWrap: 'wrap', background: T.canvas2 }}>
+          {style.gradient && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: T.ink, color: T.white, fontWeight: 500 }}>🌈 Gradiente</span>}
+          {style.bgColor && !style.gradient && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: style.bgColor, color: '#fff', fontWeight: 500, border: '1px solid rgba(0,0,0,0.1)' }}>Cor</span>}
+          {style.fontPair && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: T.blueS, color: T.blue, fontWeight: 500 }}>Aa {style.fontPair.split('+')[0].trim()}</span>}
+          {style.shadow && style.shadow !== 'none' && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: T.canvas, color: T.text, fontWeight: 500 }}>Sombra</span>}
+          {style.blur && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: T.canvas, color: T.text, fontWeight: 500 }}>Glass</span>}
+          {style.animation && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: T.goldS, color: T.gold, fontWeight: 600 }}>✨ Animação</span>}
+          <button onClick={() => updateSection({ ...selected, style: {} })}
+            style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: 'transparent', border: `1px solid var(--border)`, color: T.error, cursor: 'pointer', fontFamily: 'var(--font)', fontWeight: 500 }}>
+            Resetar
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px' }}>
+        {tab === 'conteudo' && <SectionEditor section={selected} onChange={updateSection} />}
+        {tab === 'estilo' && <StyleEditor section={selected} onChange={updateSection} />}
+      </div>
+
+      {/* Style live preview */}
+      {tab === 'estilo' && (
+        <div style={{ padding: '12px 14px', borderTop: `1px solid var(--border2)`, flexShrink: 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Prévia de estilo</div>
+          <div style={{
+            borderRadius: style.borderRadius || 8,
+            padding: '14px 16px',
+            background: style.gradient || style.bgColor || T.canvas2,
+            boxShadow: style.shadow && style.shadow !== 'none' ? style.shadow : 'none',
+            backdropFilter: style.blur ? `blur(${style.blurAmount || 8}px)` : 'none',
+            border: style.border ? `1.5px solid ${style.borderColor || T.border}` : 'none',
+            transition: 'all 300ms ease',
+            minHeight: 60,
+          }}>
+            <div style={{ fontSize: style.titleScale === 'xs' ? 12 : style.titleScale === 'sm' ? 14 : style.titleScale === 'lg' ? 20 : style.titleScale === 'xl' ? 24 : 16,
+              fontWeight: style.titleWeight || 700,
+              color: style.titleColor || (style.gradient || style.bgColor === T.ink ? T.white : T.ink),
+              fontFamily: style.fontPair ? FONT_PAIRS.find(f => f.label === style.fontPair)?.display : 'inherit',
+              letterSpacing: style.letterSpacing ? `${style.letterSpacing}px` : 'normal',
+              marginBottom: 4 }}>
+              {selected.content?.title || meta?.label}
+            </div>
+            {selected.content?.subtitle && (
+              <div style={{ fontSize: 11, color: style.textColor || T.muted }}>
+                {selected.content.subtitle.slice(0, 60)}{selected.content.subtitle.length > 60 ? '…' : ''}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── PAGE EDITOR ─── */
+const PageEditor = ({ page, onBack }) => {
+  const [sections, setSections] = useState(() => {
+    const defaults = {
+      home: [
+        { id: 1, type: 'hero', visible: true, content: { title: 'O método que une razão e alma para transformar quem lidera', subtitle: '31 ferramentas práticas. Para quem quer liderar com consciência e prosperidade.', cta_label: 'Acessar ferramentas gratuitas', cta_url: '/ferramentas', variant: 'dark', show_360_animation: true, align: 'center' } },
+        { id: 2, type: 'text', visible: true, content: { badge: 'O Método', title: 'Gestão é técnica. Liderança é consciência.', body: 'Flávio Di Morais e Marcelo Caetano reuniram 31 ferramentas das três dimensões da liderança.', align: 'center', bg: 'canvas' } },
+        { id: 3, type: 'cards', visible: true, content: { title: 'Três dimensões. Um método completo.', columns: 3, bg: 'white', card_style: 'shadow', items: [{icon:'⚙️',title:'Técnica',description:'GST, PESTEL, SWOT, OKR — as ferramentas de gestão.'},{icon:'🧠',title:'Neurociência',description:'Rapport, Kahneman — como sua mente interfere.'},{icon:'✨',title:'Propósito',description:'Autoconhecimento, consciência, legado.'}] } },
+        { id: 4, type: 'depoimentos', visible: true, content: { title: 'O que dizem sobre o Gestor360®', source: 'supabase', layout: 'grid', bg: 'canvas' } },
+        { id: 5, type: 'form', visible: true, content: { title: 'Acesse as ferramentas gratuitamente', submit_label: 'Quero as ferramentas', bg: 'blue', layout: 'centered', fields: [{field_key:'nome',label:'Seu nome',type:'text',required:true},{field_key:'email',label:'E-mail',type:'email',required:true},{field_key:'whatsapp',label:'WhatsApp',type:'tel',required:false}] } },
+        { id: 6, type: 'cta', visible: true, content: { title: 'Pronto para transformar sua liderança?', cta_label: 'Comprar o livro', variant: 'blue', align: 'center' } },
+      ]
+    };
+    return defaults[page.id === 1 ? 'home' : 'other'] || [];
+  });
+
+  const [selectedId, setSelectedId] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [dragOver, setDragOver] = useState(null);
+  const dragRef = useRef(null);
+
+  const selected = sections.find(s => s.id === selectedId);
+
+  const handleAddSection = (type, template) => {
+    const newSection = { id: Date.now(), type, visible: true, content: { ...template } };
+    setSections(prev => [...prev, newSection]);
+    setSelectedId(newSection.id);
+    setShowPicker(false);
+  };
+
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const moveSection = (id, dir) => {
+    setSections(prev => {
+      const idx = prev.findIndex(s => s.id === id);
+      const next = [...prev];
+      const swap = dir === 'up' ? idx - 1 : idx + 1;
+      if (swap < 0 || swap >= next.length) return prev;
+      [next[idx], next[swap]] = [next[swap], next[idx]];
+      return next;
+    });
+  };
+
+  const toggleVisible = id => setSections(prev => prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
+  const deleteSection = id => { setSections(prev => prev.filter(s => s.id !== id)); if (selectedId === id) setSelectedId(null); };
+  const updateSection = updated => setSections(prev => prev.map(s => s.id === updated.id ? updated : s));
+
+  const statusColor = { published: T.success, draft: T.gold };
+  const statusLabel = { published: 'Publicado', draft: 'Rascunho' };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: T.canvas2 }}>
+      {/* Top bar */}
+      <div style={{ height: 52, background: T.ink, display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12, flexShrink: 0, zIndex: 10 }}>
+        <button onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, padding: '4px 8px', borderRadius: 6 }}
+          onMouseEnter={e => e.currentTarget.style.color = T.white} onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}>
+          <Icon d={Icons.chevL} size={14} /> Páginas
+        </button>
+        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />
+        <div style={{ fontSize: 14, fontWeight: 600, color: T.white }}>{page.title}</div>
+        <div style={{ fontSize: 11, padding: '2px 8px', borderRadius: 99, background: statusColor[page.status] + '22', color: statusColor[page.status], fontWeight: 600, border: `1px solid ${statusColor[page.status]}44` }}>
+          {statusLabel[page.status]}
+        </div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>{page.slug}</div>
+        <div style={{ flex: 1 }} />
+        <button style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 12 }}>
+          <Icon d={Icons.eye} size={13} /> Visualizar
+        </button>
+        <button onClick={handleSave}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 16px', borderRadius: 6, border: 'none', background: saved ? T.success : T.gold, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, fontWeight: 600, transition: 'background 300ms ease' }}>
+          {saved ? <><Icon d={Icons.check} size={13} /> Salvo!</> : <><Icon d={Icons.save} size={13} /> Salvar</>}
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Section list */}
+        <div style={{ width: 280, background: T.white, borderRight: `1px solid var(--border2)`, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ padding: '12px 14px 8px', borderBottom: `1px solid var(--border2)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: T.muted, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Seções ({sections.length})
+            </div>
+            <button onClick={() => setShowPicker(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, height: 26, padding: '0 10px', borderRadius: 6, border: 'none', background: T.blue, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 11, fontWeight: 600 }}>
+              <Icon d={Icons.plus} size={11} /> Adicionar
+            </button>
+          </div>
+
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px' }}>
+            {sections.length === 0 && (
+              <div style={{ padding: '32px 16px', textAlign: 'center', color: T.muted }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
+                <div style={{ fontSize: 12, marginBottom: 12 }}>Nenhuma seção ainda</div>
+                <button onClick={() => setShowPicker(true)} style={{ height: 32, padding: '0 16px', borderRadius: 6, border: 'none', background: T.blue, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 12 }}>
+                  + Adicionar seção
+                </button>
+              </div>
+            )}
+            {sections.map((s, idx) => {
+              const meta = SECTION_TYPES.find(t => t.type === s.type);
+              const isSelected = selectedId === s.id;
+              return (
+                <div key={s.id}
+                  style={{ marginBottom: 6, borderRadius: 8, border: `1.5px solid ${isSelected ? T.blue : 'var(--border)'}`, background: isSelected ? T.blueS : T.white, cursor: 'pointer', transition: 'all 120ms ease', opacity: s.visible ? 1 : 0.5 }}
+                  onClick={() => setSelectedId(isSelected ? null : s.id)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px' }}>
+                    <div style={{ color: T.muted, cursor: 'grab', flexShrink: 0 }}><Icon d={Icons.drag} size={14} /></div>
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{meta?.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: isSelected ? T.blue : T.ink }}>{meta?.label}</div>
+                      {s.content?.title && <div style={{ fontSize: 11, color: T.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>{s.content.title}</div>}
+                    </div>
+                    <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                      <button onClick={e => { e.stopPropagation(); moveSection(s.id, 'up'); }} disabled={idx === 0}
+                        style={{ width: 22, height: 22, border: 'none', background: 'transparent', cursor: idx === 0 ? 'default' : 'pointer', color: T.muted, opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon d={Icons.chevU} size={11} />
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); moveSection(s.id, 'down'); }} disabled={idx === sections.length - 1}
+                        style={{ width: 22, height: 22, border: 'none', background: 'transparent', cursor: idx === sections.length-1 ? 'default' : 'pointer', color: T.muted, opacity: idx === sections.length-1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon d={Icons.chevD} size={11} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <div style={{ padding: '0 10px 8px', display: 'flex', gap: 4 }}>
+                      <button onClick={e => { e.stopPropagation(); toggleVisible(s.id); }}
+                        style={{ flex: 1, height: 26, border: `1px solid var(--border)`, borderRadius: 6, background: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 11, color: s.visible ? T.stone : T.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                        <Icon d={Icons.eye} size={11} /> {s.visible ? 'Ocultar' : 'Mostrar'}
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); deleteSection(s.id); }}
+                        style={{ width: 26, height: 26, border: `1px solid var(--border)`, borderRadius: 6, background: T.white, cursor: 'pointer', color: T.error, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon d={Icons.trash} size={11} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Center preview */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: 24, background: T.canvas2 }}>
+          <div style={{ maxWidth: 680, margin: '0 auto' }}>
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 12, color: T.muted }}>Prévia das seções — clique para editar</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button style={{ height: 28, padding: '0 10px', borderRadius: 6, border: `1px solid var(--border)`, background: T.white, cursor: 'pointer', fontSize: 11, color: T.text, fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Icon d={Icons.grid} size={12} /> Desktop
+                </button>
+                <button style={{ height: 28, padding: '0 10px', borderRadius: 6, border: `1px solid var(--border)`, background: T.white, cursor: 'pointer', fontSize: 11, color: T.text, fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  📱 Mobile
+                </button>
+              </div>
+            </div>
+
+            {sections.length === 0 && (
+              <div style={{ border: `2px dashed var(--border)`, borderRadius: 12, padding: '48px 24px', textAlign: 'center', color: T.muted }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 8 }}>Página em branco</div>
+                <div style={{ fontSize: 12, marginBottom: 16 }}>Adicione a primeira seção para começar</div>
+                <button onClick={() => setShowPicker(true)} style={{ height: 36, padding: '0 20px', borderRadius: 8, border: 'none', background: T.blue, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13 }}>
+                  + Adicionar seção
+                </button>
+              </div>
+            )}
+
+            {sections.map((s, idx) => (
+              <div key={s.id} style={{ marginBottom: 8, borderRadius: 10, border: `2px solid ${selectedId === s.id ? T.blue : 'transparent'}`, transition: 'border-color 120ms ease', opacity: s.visible ? 1 : 0.4, cursor: 'pointer', position: 'relative' }}
+                onClick={() => setSelectedId(selectedId === s.id ? null : s.id)}>
+                {selectedId === s.id && (
+                  <div style={{ position: 'absolute', top: -1, left: -1, right: -1, height: 3, background: T.blue, borderRadius: '10px 10px 0 0', zIndex: 1 }} />
+                )}
+                {!s.visible && (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, borderRadius: 8, background: 'rgba(244,242,237,0.6)' }}>
+                    <span style={{ fontSize: 11, color: T.muted, fontWeight: 600, background: T.canvas2, padding: '3px 8px', borderRadius: 99, border: `1px solid var(--border)` }}>🙈 Seção oculta</span>
+                  </div>
+                )}
+                <SectionPreview section={s} />
+                <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 4, opacity: selectedId === s.id ? 1 : 0, transition: 'opacity 120ms ease', pointerEvents: selectedId === s.id ? 'all' : 'none' }}>
+                  <button onClick={e => { e.stopPropagation(); moveSection(s.id, 'up'); }} disabled={idx === 0}
+                    style={{ width: 26, height: 26, borderRadius: 6, border: 'none', background: 'rgba(0,0,0,0.5)', color: T.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: idx === 0 ? 0.3 : 1 }}>
+                    <Icon d={Icons.chevU} size={12} />
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); moveSection(s.id, 'down'); }} disabled={idx === sections.length - 1}
+                    style={{ width: 26, height: 26, borderRadius: 6, border: 'none', background: 'rgba(0,0,0,0.5)', color: T.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: idx === sections.length-1 ? 0.3 : 1 }}>
+                    <Icon d={Icons.chevD} size={12} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {sections.length > 0 && (
+              <button onClick={() => setShowPicker(true)}
+                style={{ width: '100%', height: 44, border: `1.5px dashed var(--border)`, borderRadius: 10, background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, color: T.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all 150ms ease', marginTop: 4 }}
+                onMouseEnter={e => { e.currentTarget.style.background = T.blueS; e.currentTarget.style.borderColor = T.blue; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
+                <Icon d={Icons.plus} size={15} /> Adicionar seção
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Right panel — editor */}
+        {selected && (
+          <RightPanel selected={selected} updateSection={updateSection} setSelectedId={setSelectedId} />
+        )}
+      </div>
+
+      {showPicker && <TemplatePicker onSelect={handleAddSection} onClose={() => setShowPicker(false)} />}
+    </div>
+  );
+};
+
+/* ─── SIDEBAR ─── */
+const NAV_ITEMS = [
+  { id: 'dashboard', icon: Icons.home, label: 'Dashboard' },
+  { id: 'paginas', icon: Icons.pages, label: 'Páginas' },
+  { id: 'blog', icon: Icons.blog, label: 'Blog' },
+  { id: 'leads', icon: Icons.leads, label: 'Leads' },
+  { id: 'ferramentas', icon: Icons.tools, label: 'Ferramentas' },
+  { id: 'depoimentos', icon: Icons.testi, label: 'Depoimentos' },
+];
+
+const Sidebar = ({ active, onNav }) => (
+  <div style={{ width: 56, background: T.ink, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 0', flexShrink: 0, zIndex: 10 }}>
+    {/* Logo */}
+    <div style={{ width: 36, height: 36, borderRadius: 8, background: T.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, flexShrink: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 900, color: T.white, letterSpacing: '-0.04em' }}>G</span>
+    </div>
+
+    {NAV_ITEMS.map(item => (
+      <button key={item.id} onClick={() => onNav(item.id)} title={item.label}
+        style={{ width: 40, height: 40, borderRadius: 8, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4, transition: 'all 150ms ease',
+          background: active === item.id ? T.gold : 'transparent',
+          color: active === item.id ? T.white : 'rgba(255,255,255,0.4)' }}
+        onMouseEnter={e => { if (active !== item.id) e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+        onMouseLeave={e => { if (active !== item.id) e.currentTarget.style.background = 'transparent'; }}>
+        <Icon d={item.icon} size={17} />
+      </button>
+    ))}
+
+    <div style={{ flex: 1 }} />
+    <button title="Sair" style={{ width: 40, height: 40, borderRadius: 8, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>
+      <Icon d={Icons.logout} size={16} />
+    </button>
+  </div>
+);
+
+/* ─── PAGES LIST ─── */
+const PagesList = ({ onEdit }) => {
+  const [pages, setPages] = useState(PAGES_DATA);
+  const [showNew, setShowNew] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newSlug, setNewSlug] = useState('');
+
+  const statusColor = { published: T.success, draft: T.gold };
+  const statusLabel = { published: 'Publicado', draft: 'Rascunho' };
+
+  const handleCreate = () => {
+    if (!newTitle) return;
+    const page = { id: Date.now(), title: newTitle, slug: newSlug || '/' + newTitle.toLowerCase().replace(/\s+/g,'-'), status: 'draft', sections: 0, updated: 'agora' };
+    setPages(prev => [...prev, page]);
+    setShowNew(false); setNewTitle(''); setNewSlug('');
+    onEdit(page);
+  };
+
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 2 }}>Páginas</h1>
+            <p style={{ fontSize: 13, color: T.muted }}>Gerencie as páginas do site ogestor360.com</p>
+          </div>
+          <button onClick={() => setShowNew(!showNew)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 18px', borderRadius: 8, border: 'none', background: T.blue, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, fontWeight: 600 }}>
+            <Icon d={Icons.plus} size={14} /> Nova página
+          </button>
+        </div>
+
+        {showNew && (
+          <div style={{ background: T.white, borderRadius: 12, border: `1px solid var(--border)`, padding: 20, marginBottom: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: T.ink, marginBottom: 14 }}>Nova página</div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.text, marginBottom: 4 }}>Título</label>
+                <input value={newTitle} onChange={e => { setNewTitle(e.target.value); setNewSlug('/' + e.target.value.toLowerCase().replace(/\s+/g,'-')); }}
+                  placeholder="Ex: LP Palestra Maio/26"
+                  style={{ width: '100%', height: 36, padding: '0 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 13, outline: 'none' }}
+                  onKeyDown={e => e.key === 'Enter' && handleCreate()} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.text, marginBottom: 4 }}>Slug (URL)</label>
+                <input value={newSlug} onChange={e => setNewSlug(e.target.value)}
+                  placeholder="/minha-pagina"
+                  style={{ width: '100%', height: 36, padding: '0 10px', border: `1px solid var(--border)`, borderRadius: 6, fontFamily: 'var(--font)', fontSize: 13, fontFamily: 'monospace', outline: 'none' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={handleCreate} style={{ height: 34, padding: '0 18px', borderRadius: 6, border: 'none', background: T.blue, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, fontWeight: 600 }}>
+                Criar página
+              </button>
+              <button onClick={() => setShowNew(false)} style={{ height: 34, padding: '0 14px', borderRadius: 6, border: `1px solid var(--border)`, background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, color: T.text }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div style={{ background: T.white, borderRadius: 12, border: `1px solid var(--border)`, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 80px 100px 120px', padding: '10px 20px', borderBottom: `1px solid var(--border2)`, background: T.canvas2 }}>
+            {['Título', 'Slug', 'Seções', 'Status', ''].map((h, i) => (
+              <div key={i} style={{ fontSize: 11, fontWeight: 600, color: T.muted, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
+            ))}
+          </div>
+          {pages.map((p, idx) => (
+            <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 160px 80px 100px 120px', padding: '14px 20px', borderBottom: idx < pages.length - 1 ? `1px solid var(--border2)` : 'none', alignItems: 'center', transition: 'background 120ms ease', cursor: 'default' }}
+              onMouseEnter={e => e.currentTarget.style.background = T.canvas2}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, marginBottom: 1 }}>{p.title}</div>
+                <div style={{ fontSize: 11, color: T.muted }}>{p.updated}</div>
+              </div>
+              <div style={{ fontFamily: 'monospace', fontSize: 12, color: T.stone }}>{p.slug}</div>
+              <div style={{ fontSize: 13, color: T.text }}>{p.sections} seções</div>
+              <div>
+                <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 99, background: statusColor[p.status] + '18', color: statusColor[p.status], fontWeight: 600, border: `1px solid ${statusColor[p.status]}33` }}>
+                  {statusLabel[p.status]}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                <button onClick={() => onEdit(p)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 4, height: 30, padding: '0 12px', borderRadius: 6, border: `1px solid var(--border)`, background: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 12, color: T.blue, fontWeight: 500, transition: 'all 120ms ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = T.blueS; e.currentTarget.style.borderColor = T.blue; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = T.white; e.currentTarget.style.borderColor = 'var(--border)'; }}>
+                  <Icon d={Icons.edit} size={12} /> Editar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── DASHBOARD ─── */
+const Dashboard = ({ onNav }) => {
+  const stats = [
+    { label: 'Leads totais', value: '1.247', delta: '+38 hoje', icon: Icons.leads, color: T.blue },
+    { label: 'Páginas publicadas', value: '5', delta: '2 rascunhos', icon: Icons.pages, color: T.success },
+    { label: 'Ferramentas ativas', value: '31', delta: '10 gratuitas', icon: Icons.tools, color: T.gold },
+    { label: 'Depoimentos', value: '24', delta: '6 pendentes', icon: Icons.testi, color: T.stone },
+  ];
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 2 }}>Dashboard</h1>
+          <p style={{ fontSize: 13, color: T.muted }}>Bem-vinda, Daiana — <span style={{ color: T.gold }}>ogestor360.com</span></p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          {stats.map((s, i) => (
+            <div key={i} style={{ background: T.white, borderRadius: 12, padding: 18, border: `1px solid var(--border)`, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: s.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
+                  <Icon d={s.icon} size={16} color={s.color} />
+                </div>
+              </div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: T.ink, marginBottom: 2 }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: T.muted }}>{s.label}</div>
+              <div style={{ fontSize: 11, color: s.color, marginTop: 4, fontWeight: 500 }}>{s.delta}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ background: T.white, borderRadius: 12, border: `1px solid var(--border)`, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 18px', borderBottom: `1px solid var(--border2)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>Páginas recentes</div>
+              <button onClick={() => onNav('paginas')} style={{ fontSize: 11, color: T.blue, border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font)' }}>Ver todas →</button>
+            </div>
+            {PAGES_DATA.slice(0,4).map((p, i) => (
+              <div key={i} style={{ padding: '10px 18px', borderBottom: i < 3 ? `1px solid var(--border2)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: T.ink }}>{p.title}</div>
+                  <div style={{ fontSize: 11, color: T.muted, fontFamily: 'monospace' }}>{p.slug}</div>
+                </div>
+                <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: p.status === 'published' ? T.success + '18' : T.gold + '18', color: p.status === 'published' ? T.success : T.gold, fontWeight: 600 }}>
+                  {p.status === 'published' ? 'Online' : 'Rascunho'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: T.blue, borderRadius: 12, border: `1px solid var(--border)`, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>Ação rápida</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: T.white, marginBottom: 8, lineHeight: 1.3 }}>Criar nova landing page de campanha</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>Comece em branco ou use um dos templates prontos para lançamentos e eventos.</div>
+            </div>
+            <button onClick={() => onNav('paginas')}
+              style={{ alignSelf: 'flex-start', marginTop: 20, height: 38, padding: '0 20px', borderRadius: 8, border: 'none', background: T.gold, color: T.white, cursor: 'pointer', fontFamily: 'var(--font)', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon d={Icons.plus} size={14} /> Nova página
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── PLACEHOLDER SCREEN ─── */
+const PlaceholderScreen = ({ label, icon }) => (
+  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: T.muted, gap: 12 }}>
+    <Icon d={icon} size={36} color={T.border} />
+    <div style={{ fontSize: 16, fontWeight: 600, color: T.text }}>{label}</div>
+    <div style={{ fontSize: 13, color: T.muted }}>Esta seção está disponível no sistema real</div>
+  </div>
+);
+
+/* ─── APP ─── */
+const App = () => {
+  const [nav, setNav] = useState('paginas');
+  const [editingPage, setEditingPage] = useState(null);
+
+  if (editingPage) return <PageEditor page={editingPage} onBack={() => setEditingPage(null)} />;
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', background: T.canvas2 }}>
+      <Sidebar active={nav} onNav={setNav} />
+      {nav === 'dashboard' && <Dashboard onNav={setNav} />}
+      {nav === 'paginas' && <PagesList onEdit={setEditingPage} />}
+      {nav === 'blog' && <PlaceholderScreen label="Blog" icon={Icons.blog} />}
+      {nav === 'leads' && <PlaceholderScreen label="Leads" icon={Icons.leads} />}
+      {nav === 'ferramentas' && <PlaceholderScreen label="Ferramentas" icon={Icons.tools} />}
+      {nav === 'depoimentos' && <PlaceholderScreen label="Depoimentos" icon={Icons.testi} />}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
