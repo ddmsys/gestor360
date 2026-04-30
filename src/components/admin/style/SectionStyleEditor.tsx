@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import type { PageSection } from '@/types/cms'
 import type { SectionStyle } from '@/types/section-style'
 import { StyleBackgroundTab } from './StyleBackgroundTab'
 import { StyleTypographyTab } from './StyleTypographyTab'
 import { StyleSpacingTab } from './StyleSpacingTab'
 import { StyleEffectsTab } from './StyleEffectsTab'
+import { SectionStylePreview } from './SectionStylePreview'
 
 interface SectionStyleEditorProps {
+  section: PageSection
   style: SectionStyle
   onChange: (s: SectionStyle) => void
 }
@@ -21,7 +24,7 @@ const TABS: { id: StyleTab; label: string; icon: string }[] = [
   { id: 'efeitos',     label: 'Efeitos',     icon: '✨' },
 ]
 
-export function SectionStyleEditor({ style, onChange }: SectionStyleEditorProps) {
+export function SectionStyleEditor({ section, style, onChange }: SectionStyleEditorProps) {
   const [activeTab, setActiveTab] = useState<StyleTab>('fundo')
 
   const patch = (partial: Partial<SectionStyle>) => {
@@ -29,7 +32,7 @@ export function SectionStyleEditor({ style, onChange }: SectionStyleEditorProps)
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-full flex-col">
       {/* Sub-tabs */}
       <div className="grid grid-cols-4 border-b border-[var(--color-border)] bg-[var(--color-bg-canvas)]/40">
         {TABS.map((tab) => (
@@ -50,12 +53,14 @@ export function SectionStyleEditor({ style, onChange }: SectionStyleEditorProps)
       </div>
 
       {/* Conteúdo da sub-aba */}
-      <div className="flex flex-col gap-0">
+      <div className="flex flex-1 flex-col gap-0">
         {activeTab === 'fundo'       && <StyleBackgroundTab  style={style} onChange={patch} />}
         {activeTab === 'tipografia'  && <StyleTypographyTab  style={style} onChange={patch} />}
         {activeTab === 'espacamento' && <StyleSpacingTab     style={style} onChange={patch} />}
         {activeTab === 'efeitos'     && <StyleEffectsTab     style={style} onChange={patch} />}
       </div>
+
+      <SectionStylePreview section={section} style={style} />
     </div>
   )
 }

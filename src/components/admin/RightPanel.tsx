@@ -147,6 +147,7 @@ export function RightPanel({ section, onChange, onClose }: RightPanelProps) {
           />
         ) : (
           <SectionStyleEditor
+            section={section}
             style={currentStyle}
             onChange={handleStyleChange}
           />
