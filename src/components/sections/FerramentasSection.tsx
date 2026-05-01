@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { FerramentasContent } from '@/types/cms'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { renderText } from '@/lib/cms/render-title'
 
 interface Props {
   content: FerramentasContent
@@ -65,12 +66,12 @@ export async function FerramentasSection({ content }: Props) {
           <div className="mb-12 flex flex-col items-center gap-3 text-center">
             {title && (
               <h2 className="max-w-2xl font-display font-black leading-tight tracking-tight text-[var(--color-text-title)] text-heading">
-                {title}
+                {renderText(title)}
               </h2>
             )}
             {subtitle && (
               <p className="max-w-xl leading-relaxed text-[var(--color-text-body)] text-body-lg">
-                {subtitle}
+                {renderText(subtitle)}
               </p>
             )}
           </div>

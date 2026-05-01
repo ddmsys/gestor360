@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { AutoresContent } from "@/types/cms";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { renderText } from "@/lib/cms/render-title";
 
 interface Props {
   content: AutoresContent;
@@ -39,7 +40,7 @@ export function AutoresSection({ content }: Props) {
             )}
             {subtitle && (
               <p className="text-body-lg text-[var(--color-text-body)] max-w-xl leading-relaxed">
-                {subtitle}
+                {renderText(subtitle)}
               </p>
             )}
           </motion.div>
@@ -86,7 +87,7 @@ export function AutoresSection({ content }: Props) {
                   </p>
                 </div>
                 <p className="text-sm text-[var(--color-text-body)] leading-relaxed max-w-xs mx-auto">
-                  {autor.bio}
+                  {renderText(autor.bio)}
                 </p>
                 {/* Redes sociais */}
                 {(autor.linkedin_url ||

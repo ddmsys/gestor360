@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { FAQContent } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { renderText } from "@/lib/cms/render-title";
 
 interface Props {
   content: FAQContent;
@@ -58,7 +59,7 @@ function FAQItem({
             className="overflow-hidden"
           >
             <p className="pb-5 text-[var(--color-text-body)] leading-relaxed text-sm">
-              {answer}
+              {renderText(answer)}
             </p>
           </motion.div>
         )}
@@ -100,12 +101,12 @@ export function FAQSection({ content }: Props) {
           )}
           {title && (
             <h2 className="font-display font-black text-heading leading-tight tracking-tight text-[var(--color-text-title)] max-w-2xl">
-              {title}
+              {renderText(title)}
             </h2>
           )}
           {subtitle && (
             <p className="text-body-lg text-[var(--color-text-body)] max-w-xl leading-relaxed">
-              {subtitle}
+              {renderText(subtitle)}
             </p>
           )}
         </motion.div>

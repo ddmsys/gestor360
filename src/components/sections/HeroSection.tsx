@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { HeroContent } from '@/types/cms'
 import { digit3, digit6, digit0, fadeInUp } from '@/lib/animations'
-import { renderTitle } from '@/lib/cms/render-title'
+import { renderText, renderTitle } from '@/lib/cms/render-title'
 
 interface Props {
   content: HeroContent
@@ -135,7 +135,7 @@ export function HeroSection({ content, hasBg = false }: Props) {
             animate="visible"
             transition={{ delay: show_360_animation ? 1.0 : 0.15 }}
           >
-            {subtitle}
+            {renderText(subtitle)}
           </motion.p>
         )}
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { DepoimentosContent, DepoimentoItem } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { renderText } from "@/lib/cms/render-title";
 
 interface Props {
   content: DepoimentosContent;
@@ -98,14 +99,14 @@ export function DepoimentosSection({ content, depoimentos = [] }: Props) {
             <h2
               className={`font-display font-black text-heading leading-tight tracking-tight ${textClass.title} max-w-2xl`}
             >
-              {title}
+              {renderText(title)}
             </h2>
           )}
           {subtitle && (
             <p
               className={`text-body-lg ${textClass.body} max-w-xl leading-relaxed`}
             >
-              {subtitle}
+              {renderText(subtitle)}
             </p>
           )}
         </motion.div>
@@ -131,7 +132,7 @@ export function DepoimentosSection({ content, depoimentos = [] }: Props) {
               >
                 {dep.nota && <StarRating nota={dep.nota} />}
                 <blockquote className="text-sm text-[var(--color-text-body)] leading-relaxed flex-1">
-                  &ldquo;{dep.texto}&rdquo;
+                  &ldquo;{renderText(dep.texto)}&rdquo;
                 </blockquote>
                 <footer className="flex items-center gap-3 pt-2 border-t border-[var(--color-border)]">
                   {dep.foto_url ? (

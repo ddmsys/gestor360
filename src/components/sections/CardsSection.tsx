@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import type { CardsContent } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
-import { renderTitle } from "@/lib/cms/render-title";
+import { renderText, renderTitle } from "@/lib/cms/render-title";
 
 interface Props {
   content: CardsContent
@@ -87,7 +87,7 @@ export function CardsSection({ content, hasBg = false }: Props) {
               <p
                 className={`text-body-lg ${textClass.body} max-w-xl leading-relaxed`}
               >
-                {subtitle}
+                {renderText(subtitle)}
               </p>
             )}
           </motion.div>
@@ -122,7 +122,7 @@ export function CardsSection({ content, hasBg = false }: Props) {
                 {item.title}
               </h3>
               <p className="text-sm text-text-body leading-relaxed flex-1">
-                {item.description}
+                {renderText(item.description)}
               </p>
               {item.link_url && item.link_label && (
                 <a

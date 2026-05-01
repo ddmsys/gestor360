@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import type { TextContent } from '@/types/cms'
 import { fadeInUp } from '@/lib/animations'
-import { renderTitle } from '@/lib/cms/render-title'
+import { renderText, renderTitle } from '@/lib/cms/render-title'
 
 interface Props {
   content: TextContent
@@ -97,7 +97,7 @@ export function TextSection({ content, hasBg = false }: Props) {
       )}
 
       {subtitle && (
-        <p className={`text-body-lg ${textStyle.body} leading-relaxed mb-6`}>{subtitle}</p>
+        <p className={`text-body-lg ${textStyle.body} leading-relaxed mb-6`}>{renderText(subtitle)}</p>
       )}
 
       {body && (

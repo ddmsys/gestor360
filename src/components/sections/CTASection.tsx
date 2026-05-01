@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { CTAContent } from '@/types/cms'
 import { fadeInUp } from '@/lib/animations'
-import { renderTitle } from '@/lib/cms/render-title'
+import { renderText, renderTitle } from '@/lib/cms/render-title'
 
 interface Props {
   content: CTAContent
@@ -78,11 +78,11 @@ export function CTASection({ content, hasBg = false }: Props) {
       </h2>
 
       {subtitle && (
-        <p className={`text-body-lg ${styles.sub} max-w-xl leading-relaxed`}>{subtitle}</p>
+        <p className={`text-body-lg ${styles.sub} max-w-xl leading-relaxed`}>{renderText(subtitle)}</p>
       )}
 
       {body && (
-        <p className={`text-base ${styles.sub} max-w-xl leading-relaxed`}>{body}</p>
+        <p className={`text-base ${styles.sub} max-w-xl leading-relaxed`}>{renderText(body)}</p>
       )}
 
       <div className="flex flex-wrap gap-3">

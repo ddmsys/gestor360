@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { fadeInUp } from "@/lib/animations";
+import { renderText } from "@/lib/cms/render-title";
 
 interface Props {
   content: FormContent;
@@ -181,14 +182,14 @@ export function FormSection({ content, preCapitulo }: Props) {
               <h2
                 className={`font-display font-black text-heading leading-tight tracking-tight ${textClass.title} max-w-2xl`}
               >
-                {title}
+                {renderText(title)}
               </h2>
             )}
             {subtitle && (
               <p
                 className={`text-body-lg ${textClass.sub} max-w-xl leading-relaxed`}
               >
-                {subtitle}
+                {renderText(subtitle)}
               </p>
             )}
           </motion.div>
