@@ -20,7 +20,6 @@ const FooterSchema = z.object({
   email: z.string().email(),
   copyright: z.string(),
   nota_livro: z.string(),
-  links: z.array(NavLinkSchema),
 })
 
 const BodySchema = z.object({

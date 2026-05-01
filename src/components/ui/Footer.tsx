@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { createClient } from "@/lib/supabase/server";
 
-interface FooterLink {
+interface NavLink {
   href: string;
   label: string;
 }
@@ -13,7 +13,10 @@ interface FooterConfig {
   email: string;
   copyright: string;
   nota_livro: string;
-  links: FooterLink[];
+}
+
+interface NavConfig {
+  links: NavLink[];
 }
 
 const defaultFooter: FooterConfig = {
@@ -22,24 +25,28 @@ const defaultFooter: FooterConfig = {
   email: "contato@ogestor360.com",
   copyright: "© {year} oGestor360® — DDM Editora. Todos os direitos reservados.",
   nota_livro: "Livro publicado em abril de 2026",
-  links: [
-    { href: "/metodo", label: "O Método" },
-    { href: "/ferramentas", label: "Ferramentas" },
-    { href: "/livro", label: "O Livro" },
-    { href: "/mentoria", label: "Mentoria" },
-    { href: "/sobre", label: "Sobre" },
-  ],
 };
+
+const defaultLinks: NavLink[] = [
+  { href: "/metodo", label: "O Método" },
+  { href: "/ferramentas", label: "Ferramentas" },
+  { href: "/livro", label: "O Livro" },
+  { href: "/mentoria", label: "Mentoria" },
+  { href: "/sobre", label: "Sobre" },
+];
 
 export async function Footer() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("site_config")
-    .select("value")
-    .eq("key", "footer")
-    .single();
+    .select("key, value")
+    .in("key", ["footer", "nav"]);
 
-  const footer: FooterConfig = (data?.value as FooterConfig) ?? defaultFooter;
+  const rows = data ?? [];
+  const footer = (rows.find((r) => r.key === "footer")?.value as FooterConfig) ?? defaultFooter;
+  const nav = (rows.find((r) => r.key === "nav")?.value as NavConfig) ?? {};
+  const links = nav.links ?? defaultLinks;
+
   const year = new Date().getFullYear();
   const copyright = footer.copyright.replace("{year}", String(year));
 
@@ -67,7 +74,7 @@ export async function Footer() {
             Navegação
           </p>
           <ul className="flex flex-col gap-2" role="list">
-            {footer.links.map(({ href, label }) => (
+            {links.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}

@@ -19,7 +19,6 @@ interface FooterConfig {
   email: string
   copyright: string
   nota_livro: string
-  links: NavLink[]
 }
 
 type Tab = 'nav' | 'footer'
@@ -105,7 +104,6 @@ export default function ConfiguracoesPage() {
     email: '',
     copyright: '',
     nota_livro: '',
-    links: [],
   })
 
   useEffect(() => {
@@ -273,10 +271,14 @@ export default function ConfiguracoesPage() {
           </div>
 
           <div className="border-t border-[var(--color-border)] pt-6">
-            <h2 className="font-display font-bold text-base text-[var(--color-text-title)] mb-4">
-              Links do rodapé
-            </h2>
-            <LinkEditor links={footer.links} onChange={(links) => setFooter({ ...footer, links })} />
+          <div className="flex items-start gap-3 rounded-md bg-blue-50 border border-blue-100 p-4">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-blue-500 mt-0.5">
+              <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" />
+            </svg>
+            <p className="text-sm text-blue-700 leading-relaxed">
+              Os links do rodapé são os mesmos da navegação — edite-os na aba <strong>Navegação (Header)</strong>.
+            </p>
+          </div>
           </div>
 
           <div className="flex justify-end pt-2">
