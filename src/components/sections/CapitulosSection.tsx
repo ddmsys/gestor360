@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from "framer-motion";
 import type { CapitulosContent } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";

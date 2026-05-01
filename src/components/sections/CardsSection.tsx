@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from "framer-motion";
 import type { CardsContent } from "@/types/cms";
 import { Badge } from "@/components/ui/Badge";
@@ -46,7 +48,7 @@ export function CardsSection({ content, hasBg = false }: Props) {
     subtitle,
     badge,
     badge_color = "blue",
-    cards: items,
+    cards: items = [],
     columns = 3,
     bg = "white",
     card_style = "shadow",

@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { AutoresContent } from "@/types/cms";
@@ -11,7 +13,7 @@ export function AutoresSection({ content }: Props) {
   const {
     title = "Os autores",
     subtitle,
-    autores,
+    autores = [],
     bg = "canvas",
     layout = "side-by-side",
   } = content;

@@ -14,10 +14,10 @@ const nextConfig: NextConfig = {
         destination: '/ferramentas',
         permanent: true,
       },
-      // Variações defensivas caso algum QR tenha path diferente
+      // Variações defensivas caso algum QR tenha path diferente (exige ao menos 1 segmento)
       {
-        source: '/livro/:path*',
-        destination: '/:path*',
+        source: '/livro/:path+',
+        destination: '/:path+',
         permanent: true,
       },
     ]
