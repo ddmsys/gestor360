@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { SaveSectionsRequestSchema } from '@/lib/cms/style-schemas'
 
@@ -66,10 +67,18 @@ export async function PUT(
   }
 
   // Atualizar updated_at da página
-  await supabase
+  const { data: pageData } = await supabase
     .from('pages')
     .update({ updated_at: new Date().toISOString() })
     .eq('id', pageId)
+    .select('slug')
+    .single()
+
+  // Invalida cache do Vercel imediatamente para o slug da página
+  if (pageData?.slug) {
+    const path = pageData.slug === 'home' ? '/' : `/${pageData.slug}`
+    revalidatePath(path)
+  }
 
   return Response.json({ ok: true, count: sections.length })
 }
