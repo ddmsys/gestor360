@@ -166,19 +166,22 @@ export default function ConfiguracoesPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--color-bg-canvas)] rounded-[var(--radius-lg)] border border-[var(--color-border)] mb-6 w-fit">
-        {(['nav', 'footer'] as Tab[]).map((t) => (
+      <div className="flex gap-2 mb-6 border-b border-[var(--color-border)]">
+        {([
+          { key: 'nav', label: 'Navegação (Header)' },
+          { key: 'footer', label: 'Rodapé (Footer)' },
+        ] as { key: Tab; label: string }[]).map(({ key, label }) => (
           <button
-            key={t}
+            key={key}
             type="button"
-            onClick={() => setTab(t)}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-[var(--radius-md)] transition-all ${
-              tab === t
-                ? 'bg-white text-[var(--color-text-title)] shadow-[var(--shadow-sm)]'
-                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]'
+            onClick={() => setTab(key)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-all ${
+              tab === key
+                ? 'border-[var(--color-brand-blue)] text-[var(--color-brand-blue)]'
+                : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-body)] hover:border-[var(--color-border)]'
             }`}
           >
-            {t === 'nav' ? 'Navegação (Header)' : 'Rodapé (Footer)'}
+            {label}
           </button>
         ))}
       </div>
