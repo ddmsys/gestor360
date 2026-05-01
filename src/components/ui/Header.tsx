@@ -1,14 +1,40 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
+import { createClient } from "@/lib/supabase/server";
 
-const navLinks = [
-  { href: "/metodo", label: "O Método" },
-  { href: "/ferramentas", label: "Ferramentas" },
-  { href: "/livro", label: "O Livro" },
-  { href: "/sobre", label: "Sobre" },
-];
+interface NavLink {
+  href: string;
+  label: string;
+}
 
-export function Header() {
+interface NavConfig {
+  links: NavLink[];
+  cta_label: string;
+  cta_href: string;
+}
+
+const defaultNav: NavConfig = {
+  links: [
+    { href: "/metodo", label: "O Método" },
+    { href: "/ferramentas", label: "Ferramentas" },
+    { href: "/livro", label: "O Livro" },
+    { href: "/mentoria", label: "Mentoria" },
+    { href: "/sobre", label: "Sobre" },
+  ],
+  cta_label: "Falar com um Conselheiro",
+  cta_href: "/mentoria",
+};
+
+export async function Header() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("site_config")
+    .select("value")
+    .eq("key", "nav")
+    .single();
+
+  const nav: NavConfig = (data?.value as NavConfig) ?? defaultNav;
+
   return (
     <header
       className="sticky top-0 z-(--z-header) bg-white/95 backdrop-blur-sm border-b border-border"
@@ -25,7 +51,7 @@ export function Header() {
 
         <nav aria-label="Navegação principal">
           <ul className="hidden md:flex items-center gap-6" role="list">
-            {navLinks.map(({ href, label }) => (
+            {nav.links.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
@@ -39,10 +65,10 @@ export function Header() {
         </nav>
 
         <Link
-          href="/ferramentas"
-          className="inline-flex items-center justify-center h-10 px-5 rounded-md bg-brand-blue text-white text-sm font-semibold hover:bg-brand-blue-hover transition-colors duration-(--transition-fast)"
+          href={nav.cta_href}
+          className="hidden sm:inline-flex items-center justify-center h-10 px-5 rounded-md bg-brand-blue text-white text-sm font-semibold hover:bg-brand-blue-hover transition-colors duration-(--transition-fast)"
         >
-          Acessar ferramentas
+          {nav.cta_label}
         </Link>
       </div>
     </header>

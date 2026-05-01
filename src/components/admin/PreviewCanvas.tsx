@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import type { PageSection } from '@/types/cms'
 import { TYPE_LABELS, TYPE_ICONS } from '@/lib/cms/section-templates'
+import { SectionRendererPreview } from '@/components/sections/SectionRendererPreview'
 
-// ─── SectionPreview (miniatura visual do card) ────────────────────────────
+// ─── SectionPreview (miniatura — modo compacto) ───────────────────────────
 
 function SectionPreview({ section }: { section: PageSection }) {
   const c = section.content as Record<string, unknown>
@@ -56,7 +57,6 @@ function SectionPreview({ section }: { section: PageSection }) {
       className="relative rounded-[var(--radius-md)] overflow-hidden min-h-[80px] flex flex-col justify-between p-3"
       style={bgStyle}
     >
-      {/* Tipo em marca d'água */}
       <span
         className="absolute inset-0 flex items-center justify-center text-5xl select-none pointer-events-none opacity-[0.06]"
         aria-hidden="true"
@@ -64,7 +64,6 @@ function SectionPreview({ section }: { section: PageSection }) {
         {TYPE_ICONS[section.type]}
       </span>
 
-      {/* Conteúdo */}
       <div className="relative z-10">
         <div className="flex items-center gap-1.5 mb-1.5">
           <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">
@@ -120,14 +119,47 @@ interface PreviewCanvasProps {
 
 export function PreviewCanvas({ sections, selectedId, onSelect, onAdd }: PreviewCanvasProps) {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop')
+  const [mode, setMode] = useState<'live' | 'compact'>('live')
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#F4F2ED] min-w-0">
       {/* Toolbar do canvas */}
       <div className="shrink-0 flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-white/60">
-        <span className="text-xs text-[var(--color-text-muted)]">
-          Prévia das seções
-        </span>
+        {/* Toggle Live / Compacto */}
+        <div className="flex items-center gap-1 p-0.5 rounded-[var(--radius-md)] bg-[var(--color-bg-canvas)] border border-[var(--color-border)]">
+          <button
+            type="button"
+            onClick={() => setMode('live')}
+            aria-label="Preview ao vivo"
+            title="Componentes reais"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[5px] text-xs font-semibold transition-all ${
+              mode === 'live'
+                ? 'bg-white text-[var(--color-text-title)] shadow-[var(--shadow-sm)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]'
+            }`}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="2" /><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
+            </svg>
+            Ao vivo
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('compact')}
+            aria-label="Vista compacta"
+            title="Miniaturas"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[5px] text-xs font-semibold transition-all ${
+              mode === 'compact'
+                ? 'bg-white text-[var(--color-text-title)] shadow-[var(--shadow-sm)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-body)]'
+            }`}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+            </svg>
+            Compacto
+          </button>
+        </div>
 
         {/* Toggle Desktop / Mobile */}
         <div className="flex items-center gap-1 p-0.5 rounded-[var(--radius-md)] bg-[var(--color-bg-canvas)] border border-[var(--color-border)]">
@@ -171,7 +203,6 @@ export function PreviewCanvas({ sections, selectedId, onSelect, onAdd }: Preview
 
       {/* Área de scroll */}
       <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col items-center">
-        {/* Container com largura do viewport */}
         <div
           className={`w-full transition-all duration-300 ${viewport === 'mobile' ? 'max-w-97.5' : 'max-w-full'}`}
         >
@@ -198,7 +229,40 @@ export function PreviewCanvas({ sections, selectedId, onSelect, onAdd }: Preview
                 Adicionar primeira seção
               </button>
             </div>
+          ) : mode === 'live' ? (
+            /* ── Modo ao vivo: componentes reais ── */
+            <div className="bg-white rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-md)] border border-[var(--color-border)]">
+              {sections.map((section) => {
+                const isSelected = section.id === selectedId
+                return (
+                  <div
+                    key={section.id}
+                    onClick={() => onSelect(section.id)}
+                    className={`relative cursor-pointer transition-all group ${
+                      isSelected ? 'ring-2 ring-inset ring-(--color-brand-blue)' : 'hover:ring-1 hover:ring-inset hover:ring-(--color-brand-blue)/40'
+                    } ${!section.visible ? 'opacity-40' : ''}`}
+                  >
+                    {/* Badge selecionado */}
+                    {isSelected && (
+                      <div className="absolute top-2 left-2 z-20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[var(--color-brand-blue)] text-white rounded shadow">
+                        {TYPE_LABELS[section.type]}
+                      </div>
+                    )}
+                    {/* Badge oculta */}
+                    {!section.visible && (
+                      <div className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[var(--color-text-muted)] text-white rounded">
+                        Oculta
+                      </div>
+                    )}
+                    {/* Overlay de clique */}
+                    <div className={`absolute inset-0 z-10 transition-colors ${isSelected ? 'bg-transparent' : 'hover:bg-[var(--color-brand-blue)]/5'}`} />
+                    <SectionRendererPreview section={section} />
+                  </div>
+                )
+              })}
+            </div>
           ) : (
+            /* ── Modo compacto: miniaturas ── */
             <div className="space-y-2">
               {sections.map((section) => {
                 const isSelected = section.id === selectedId
@@ -212,24 +276,19 @@ export function PreviewCanvas({ sections, selectedId, onSelect, onAdd }: Preview
                         : 'hover:ring-1 hover:ring-[var(--color-brand-blue)]/40 hover:ring-offset-1'
                     } ${!section.visible ? 'opacity-40' : ''}`}
                   >
-                    {/* Linha de acento no topo quando selecionado */}
                     {isSelected && (
                       <div className="absolute top-0 left-0 right-0 h-0.5 bg-[var(--color-brand-blue)] rounded-t-[var(--radius-lg)] z-10" />
                     )}
-
-                    {/* Badge "Seção oculta" */}
                     {!section.visible && (
                       <div className="absolute top-2 right-2 z-10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[var(--color-text-muted)] text-white rounded">
                         Oculta
                       </div>
                     )}
-
                     <SectionPreview section={section} />
                   </div>
                 )
               })}
 
-              {/* Botão adicionar no final */}
               <button
                 onClick={onAdd}
                 className="w-full flex items-center justify-center gap-2 py-3 text-xs font-semibold text-[var(--color-brand-blue)] border border-dashed border-[var(--color-brand-blue)]/30 rounded-[var(--radius-md)] hover:bg-[var(--color-brand-blue)]/5 transition-colors mt-2"
@@ -240,6 +299,20 @@ export function PreviewCanvas({ sections, selectedId, onSelect, onAdd }: Preview
                 Adicionar seção
               </button>
             </div>
+          )}
+
+          {/* Botão adicionar no modo live */}
+          {mode === 'live' && sections.length > 0 && (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="w-full flex items-center justify-center gap-2 py-3 mt-3 text-xs font-semibold text-[var(--color-brand-blue)] border border-dashed border-[var(--color-brand-blue)]/30 rounded-[var(--radius-md)] hover:bg-[var(--color-brand-blue)]/5 transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Adicionar seção
+            </button>
           )}
         </div>
       </div>
